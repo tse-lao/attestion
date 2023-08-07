@@ -1,10 +1,11 @@
 "use client";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Attestion, resolveColumns } from "./resolve-columns";
 import { ResolveTable } from "./resolve-table";
 
 
-export default function ResolveData() {
+export default function ResolveData({id, attestations}: {id: string, attestations: number}) {
   const [data, setData] = useState<Attestion[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,6 +14,74 @@ export default function ResolveData() {
       let unixTimestamp = Math.floor(Date.now() / 1000);
       let newTimestamp = unixTimestamp + 1000000;
       // Fetch data from your API here.
+      
+      const getData = async () => {
+        const baseURL = `https://optimism-goerli.easscan.org/graphql`;
+        const response = await axios.post<any>(
+          `${baseURL}/graphql`,
+          {
+            query:
+              `query FindFirstSchema($where: SchemaWhereUniqueInput!) {
+                getSchema(where: $where) {
+                  _count {
+                    attestations
+                  }
+                  creator
+                  id
+                  index
+                  resolver
+                  revocable
+                  schema
+                  txid
+                  time
+                  attestations {
+                    attester
+                    data
+                    decodedDataJson
+                    expirationTime
+                    ipfsHash
+                    id
+                    isOffchain
+                    recipient
+                    refUID
+                    revocable
+                    revocationTime
+                    revoked
+                    schemaId
+                    time
+                    timeCreated
+                    txid
+                  }
+                }
+              }`,
+            variables: {
+              where: {
+                id: id,
+              },
+            },
+          },
+          {
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+       
+        setData(response.data.data.getSchema)
+        //fix schema 
+        console.log(response.data.data.getSchema)
+        setLoading(false)
+      
+    }
+    
+    if(id){
+      if(attestations < 1){
+        setLoading(false)
+        return;
+      }
+      getData()
+    }
+      
       setData([
         {
           id: "1",
@@ -57,10 +126,9 @@ export default function ResolveData() {
       ]
       );
       
-      setLoading(false);
+
     }
 
-    getData();
   }, []);
 
   return (

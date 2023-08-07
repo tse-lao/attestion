@@ -4,16 +4,12 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import SchemaForm from "@/components/core/attestation/schema/schema-form";
-import { toast } from "react-toastify";
 import AttestionData from "./attestion-table/attestion-data";
 import ResolveData from "./resolve-table/resolve-data";
 
@@ -28,12 +24,10 @@ export default function AttestionDetails({
   schema: any;
   hasAccess: any;
 }) {
-  async function createAttestation() {
-    toast.success("Attestation created");
-  }
+  
 
   return (
-    <Tabs defaultValue="account" className="w-full flex flex-col items-center">
+    <Tabs defaultValue="attest" className="w-full flex flex-col items-center">
       <TabsList className="grid max-w-2xl grid-cols-3 mb-4">
         <TabsTrigger value="attest">Attest</TabsTrigger>
         <TabsTrigger value="view">View Attestations</TabsTrigger>
@@ -50,26 +44,8 @@ export default function AttestionDetails({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <SchemaForm list={schema} />
-            <div className="space-y-1">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" placeholder="Please enter a name" />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="tags">Tags</Label>
-              <Input id="tags" placeholder="Please enter tags" />
-            </div>
-            <div className="space-y-1">
-              <Label htmlFor="cid">Cid</Label>
-              <Input id="cid" placeholder="please select cid" />
-            </div>
+            <SchemaForm list={schema} schemaUID={id} />
           </CardContent>
-          <CardFooter className="w-full">
-            
-            <Button className="w-full" onClick={createAttestation}>
-              Attest
-            </Button>
-          </CardFooter>
         </Card>
       </TabsContent>
       <TabsContent value="view" className="w-full">
@@ -83,7 +59,7 @@ export default function AttestionDetails({
       <TabsContent value="revoke" className="w-full">
         {hasAccess.revoke ? (
           <div>
-           <ResolveData />
+            <ResolveData id={id} attestations={attestations}/>
            <div className="grid grid-cols-2 gap-8">
              <Button>Resolve Attestations</Button>
              <Button>Split Minting Funds</Button>
