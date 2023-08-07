@@ -1,8 +1,8 @@
 "use client";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { WagmiConfig, configureChains, createConfig } from "wagmi";
-import { goerli, mainnet, polygonMumbai } from "wagmi/chains";
+import { Chain, WagmiConfig, configureChains, createConfig } from "wagmi";
+
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { publicProvider } from "wagmi/providers/public";
 
@@ -11,8 +11,48 @@ import Web3AuthConnectorInstance from "./Web3AuthConnectorInstance";
 import Navbar from "./nav-bar";
 
 // Configure chains & providers with the Public provider.
+
+export const polygonMumbai = {
+  id: 80_001,
+  name: 'Polygon Mumbai',
+  network: 'maticmum',
+  nativeCurrency: { name: 'MATIC', symbol: 'MATIC', decimals: 18 },
+  rpcUrls: {
+    alchemy: {
+      http: ['https://polygon-mumbai.g.alchemy.com/v2'],
+      webSocket: ['wss://polygon-mumbai.g.alchemy.com/v2'],
+    },
+    infura: {
+      http: ['https://polygon-mumbai.infura.io/v3'],
+      webSocket: ['wss://polygon-mumbai.infura.io/ws/v3'],
+    },
+    default: {
+      http: ['https://polygon-mumbai-bor.publicnode.com	'],
+    },
+    public: {
+      http: ['https://polygon-mumbai-bor.publicnode.com	'],
+    },
+  },
+  blockExplorers: {
+    etherscan: {
+      name: 'PolygonScan',
+      url: 'https://mumbai.polygonscan.com',
+    },
+    default: {
+      name: 'PolygonScan',
+      url: 'https://mumbai.polygonscan.com',
+    },
+  },
+  contracts: {
+    multicall3: {
+      address: '0xca11bde05977b3631167028862be2a173976ca11',
+      blockCreated: 25770160,
+    },
+  },
+  testnet: true,
+} as const satisfies Chain;
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [goerli, mainnet, polygonMumbai],
+  [polygonMumbai],
   [publicProvider()]
 );
 
@@ -38,8 +78,8 @@ let links = [
     name: "Home",
   },
   {
-    href: "/attestions",
-    name: "Attestions",
+    href: "/attestation",
+    name: "Attestation",
   },
 ];
 

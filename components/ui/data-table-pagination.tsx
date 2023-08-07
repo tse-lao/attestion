@@ -1,19 +1,19 @@
 import {
-    ChevronLeftIcon,
-    ChevronRightIcon,
-    DoubleArrowLeftIcon,
-    DoubleArrowRightIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  DoubleArrowLeftIcon,
+  DoubleArrowRightIcon,
 } from "@radix-ui/react-icons"
 import { Table } from "@tanstack/react-table"
   
 
 import { Button } from "./button"
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "./select"
   
   interface DataTablePaginationProps<TData> {
@@ -24,7 +24,7 @@ import {
     table,
   }: DataTablePaginationProps<TData>) {
     return (
-      <div className="flex items-center justify-between px-2">
+      <div className="flex w-full items-center justify-between px-2">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
           {table.getFilteredRowModel().rows.length} row(s) selected.

@@ -1,5 +1,6 @@
 "use client"
 
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
@@ -43,6 +44,13 @@ export const resolveColumns: ColumnDef<Attestion>[] = [
   {
     accessorKey: "tags",
     header: "Tags",
+    cell: ({ row }) => {
+      const tags = row.getValue("tags") as string;
+      const tagArray = tags.split(",") as [];
+
+      return tagArray.map((tag, i) => <Badge key={i} >{tag}</Badge>);
+
+    }
   },
   {
     accessorKey: "time",

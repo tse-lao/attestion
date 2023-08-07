@@ -42,8 +42,8 @@ export default function Navbar({ links }: { links: any }) {
                 </div>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
-                <Link className="bg-green-300 font-semibold text-sm rounded-md px-3 py-2 text-gray-800 hover:bg-green-200 inline-flex items-center" href="/attestions/create">
-                    Create Attestion
+                <Link className="bg-green-300 font-semibold text-sm rounded-md px-3 py-2 text-gray-800 hover:bg-green-200 inline-flex items-center" href="/attestation/create">
+                    Create Attestation
                   </Link>
 
                 {/* Profile dropdown */}

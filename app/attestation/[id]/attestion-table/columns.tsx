@@ -1,5 +1,6 @@
 "use client"
 
+import { Badge } from "@/components/ui/badge"
 import { ColumnDef } from "@tanstack/react-table"
 
 // This type is used to define the shape of our data.
@@ -13,7 +14,7 @@ export type Attestion = {
   email: string
 }
 
-export const voteColumn: ColumnDef<Attestion>[] = [
+export const AttestionColumns: ColumnDef<Attestion>[] = [
   {
     accessorKey: "id",
     header: "Id",
@@ -29,5 +30,12 @@ export const voteColumn: ColumnDef<Attestion>[] = [
   {
     accessorKey: "tags",
     header: "Tags",
+    cell: ({ row }) => {
+      const tags = row.getValue("tags") as string;
+      const tagArray = tags.split(",") as [];
+      return tagArray.map((tag, i) => <Badge key={i} className="mx-1">{tag}</Badge>);
+
+    }
   },
+
 ]
