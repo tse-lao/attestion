@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { CONTRACTS } from "@/constants/contracts";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
@@ -24,7 +25,7 @@ export type RevokerItem = {
   type: string;
   tokenId: string;
 };
-export type SchemaInput = { 
+export type SchemaInput = {
   name: string;
   type: string;
   isArray: string;
@@ -37,17 +38,18 @@ export default function CreateAttestion() {
     attestRevokePeriod: "100",
     attestRevokePenalty: "1000000000000000000",
     resolutionDays: "100",
+    mintPrice: 0,
     schemaInput: {
-      name: "", 
-      type: "string", 
-      isArray: "false"
+      name: "",
+      type: "string",
+      isArray: "false",
     } as SchemaInput,
     schema: "",
     attester: [] as RevokerItem[],
     revoker: [] as RevokerItem[],
     attesterToken: "0x000000",
     attestorTokenID: "0",
-    attestReward: "1000000000000000000",
+    attestReward: 1,
     isMintable: false,
     revokersToken: "0x000000",
     revokersTokenID: "0",
@@ -59,22 +61,27 @@ export default function CreateAttestion() {
     abi: CONTRACTS.attestionFactory.optimistic.abi,
     functionName: "createSuperSchema",
   });
-  
+
   const addSchemaInput = () => {
-    
-    if(formData.schemaInput.name == "" || formData.schemaInput.type == ""){
+    if (formData.schemaInput.name == "" || formData.schemaInput.type == "") {
       toast.error("Please fill out the name and type");
       return;
     }
-    
-    let newSchema =""
-    if(formData.schema.length < 1){
-      newSchema += `${formData.schemaInput.name} ${formData.schemaInput.type}`
-    }else{
-      newSchema += `,${formData.schemaInput.name} ${formData.schemaInput.type}`
-    }
-    if(formData.schemaInput.isArray == "true"){
-      newSchema += "[]"; 
+
+    let newSchema = "";
+    if (formData.schema.length < 1) {
+      if (formData.schemaInput.isArray == "true") {
+        newSchema += `${formData.schemaInput.type}[] ${formData.schemaInput.name}`;
+        return;
+      }
+
+      newSchema += `${formData.schemaInput.type} ${formData.schemaInput.name}`;
+    } else {
+      if (formData.schemaInput.isArray == "true") {
+        newSchema += `,${formData.schemaInput.type}[] ${formData.schemaInput.name}`;
+        return;
+      }
+      newSchema += `,${formData.schemaInput.type} ${formData.schemaInput.name}`;
     }
 
     console.log(newSchema);
@@ -82,9 +89,9 @@ export default function CreateAttestion() {
       ...formData,
       schema: newSchema,
       schemaInput: {
-        name: "", 
-        type: "string", 
-        isArray: "false"
+        name: "",
+        type: "string",
+        isArray: "false",
       },
     });
   };
@@ -95,7 +102,7 @@ export default function CreateAttestion() {
       [e.target.name]: e.target.value,
     });
   };
-  
+
   const handleSchemaChange = (e: any) => {
     setFormData({
       ...formData,
@@ -105,8 +112,8 @@ export default function CreateAttestion() {
       },
     });
   };
-  const handleTypeChange = (e:any, type: string) => {
-    if(type == "isArray"){
+  const handleTypeChange = (e: any, type: string) => {
+    if (type == "isArray") {
       setFormData({
         ...formData,
         schemaInput: {
@@ -115,16 +122,15 @@ export default function CreateAttestion() {
         },
       });
       return;
-    };
+    }
     setFormData({
       ...formData,
       schemaInput: {
         ...formData.schemaInput,
-        "type": e,
+        type: e,
       },
     });
-  }
-  
+  };
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -133,11 +139,10 @@ export default function CreateAttestion() {
     //[attestionDays, schema, mintPrice, attestReward, mitnable]
     let params = [
       formData.name,
-      
       formData.description,
       formData.resolutionDays,
       formData.schema,
-      0,
+      formData.mintPrice,
       formData.attestReward,
       formData.isMintable,
     ];
@@ -155,6 +160,25 @@ export default function CreateAttestion() {
     if (data) {
       console.log(data);
       toast.success("Success");
+    }
+  };
+
+  const changeMintable = (e: any) => {
+    
+    if(e == "true"){
+      setFormData({
+        ...formData,
+        isMintable: true,
+        attestReward: 0,
+      });
+      return; 
+    }else{
+      setFormData({
+        ...formData,
+        isMintable: false,
+        mintPrice: 0,
+      });
+      return;
     }
   };
 
@@ -278,23 +302,30 @@ export default function CreateAttestion() {
               required={true}
               className="col-span-2"
             />
-            <Select name="type"  defaultValue={formData.schemaInput.type} onValueChange={(e) => handleTypeChange(e, "type")}>
-                <SelectTrigger className="w-full"  >
-                  <SelectValue placeholder="Select inputtype"   />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Select your input type</SelectLabel>
-                    <SelectItem value="string">String</SelectItem>
-                    <SelectItem value="number">Number</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+            <Select
+              name="type"
+              defaultValue={formData.schemaInput.type}
+              onValueChange={(e) => handleTypeChange(e, "type")}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select inputtype" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Select your input type</SelectLabel>
+                  <SelectItem value="string">String</SelectItem>
+                  <SelectItem value="uint256">Number</SelectItem>
+                </SelectGroup>
+              </SelectContent>
+            </Select>
             <div className="flex items-center gap-2">
-              
-            <Select name="isArray"  defaultValue={formData.schemaInput.isArray.toString()} onValueChange={(e) => handleTypeChange(e, "isArray")}>
-                <SelectTrigger className="w-full"  >
-                  <SelectValue placeholder="Select inputtype"   />
+              <Select
+                name="isArray"
+                defaultValue={formData.schemaInput.isArray.toString()}
+                onValueChange={(e) => handleTypeChange(e, "isArray")}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select inputtype" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -339,9 +370,17 @@ export default function CreateAttestion() {
           <div className="grid grid-cols-2 w-full  items-center gap-1.5">
             <div className="col-span-1">
               <Label htmlFor="picture">Mintable</Label>
-              <Select>
-                <SelectTrigger className="w-full"   name="isMintable" value={formData.isMintable.toString()} onChange={handleChange}>
-                  <SelectValue  placeholder="Mintable"   />
+              <Select
+                defaultValue={formData.isMintable.toString()}
+                onValueChange={(e) => changeMintable(e)}
+              >
+                <SelectTrigger
+                  className="w-full"
+                  name="isMintable"
+                  value={formData.isMintable.toString()}
+                  onChange={handleChange}
+                >
+                  <SelectValue placeholder="Mintable" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -352,17 +391,32 @@ export default function CreateAttestion() {
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="attestReward">Attest Reward</Label>
-              <Input
-                name="attestReward"
-                type="number"
-                value={formData.attestReward}
-                onChange={handleChange}
-                placeholder="Enter attestation reward"
-                required={true}
-              />
-            </div>
+
+            {formData.isMintable ? (
+              <div>
+                <Label htmlFor="mintPrice">Mint price</Label>
+                <Input
+                  name="mintPrice"
+                  type="number"
+                  value={formData.mintPrice}
+                  onChange={handleChange}
+                  placeholder="Enter mint price"
+                  required={true}
+                />
+              </div>
+            ) : (
+              <div>
+                <Label htmlFor="attestReward">Attest Reward</Label>
+                <Input
+                  name="attestReward"
+                  type="number"
+                  value={formData.attestReward}
+                  onChange={handleChange}
+                  placeholder="Enter attestation reward"
+                  required={true}
+                />
+              </div>
+            )}
           </div>
 
           <div className="grid w-full  items-center gap-2">
@@ -469,12 +523,22 @@ export default function CreateAttestion() {
           ))}
 
           <div className="w-full">
-            <Button
-              className="w-full bg-green-300 text-gray-900 hover:text-green-300"
-              onClick={handleSubmit}
-            >
-              Create Attestion
-            </Button>
+            {isLoading ? (
+              <Button
+                className="w-full bg-green-300 text-gray-900 hover:text-green-300"
+                onClick={handleSubmit}
+              >
+                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+              </Button>
+            ) : (
+              <Button
+                className="w-full bg-green-300 text-gray-900 hover:text-green-300"
+                onClick={handleSubmit}
+              >
+                <PlusIcon className="mr-2 h-4 w-4" />{" "}
+                <span> Create Attestion</span>
+              </Button>
+            )}
           </div>
         </div>
       </div>

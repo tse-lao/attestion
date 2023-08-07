@@ -13,7 +13,7 @@ export default function SchemaList({list}: {list?: string}) {
         if(list){
             list.split(",").map((listItem: string) => {
                 listItem.split(",").map((item: string) => {
-                    const [name, type] = listItem.split(" ")
+                    const [type, name] = listItem.split(" ")
                     setSchema((prev) => [...prev, {name, type}])
                 })  
             });

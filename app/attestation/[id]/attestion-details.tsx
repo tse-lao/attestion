@@ -21,10 +21,12 @@ export default function AttestionDetails({
   attestations,
   id,
   schema,
+  hasAccess
 }: {
   attestations: any;
   id: string;
   schema: any;
+  hasAccess: any;
 }) {
   async function createAttestation() {
     toast.success("Attestation created");
@@ -34,7 +36,7 @@ export default function AttestionDetails({
     <Tabs defaultValue="account" className="w-full flex flex-col items-center">
       <TabsList className="grid max-w-2xl grid-cols-3 mb-4">
         <TabsTrigger value="attest">Attest</TabsTrigger>
-        <TabsTrigger value="view">View Attestions</TabsTrigger>
+        <TabsTrigger value="view">View Attestations</TabsTrigger>
         <TabsTrigger value="revoke">Revoke</TabsTrigger>
       </TabsList>
       <TabsContent value="attest">
@@ -63,6 +65,7 @@ export default function AttestionDetails({
             </div>
           </CardContent>
           <CardFooter className="w-full">
+            
             <Button className="w-full" onClick={createAttestation}>
               Attest
             </Button>
@@ -70,14 +73,26 @@ export default function AttestionDetails({
         </Card>
       </TabsContent>
       <TabsContent value="view" className="w-full">
-        <AttestionData />
+      {hasAccess.attest ? (
+              <AttestionData />
+              ): (
+                <div>No access </div>
+              )}
+        
       </TabsContent>
       <TabsContent value="revoke" className="w-full">
-        <ResolveData />
-        <div className="grid grid-cols-2 gap-8">
-          <Button>Resolve Attestations</Button>
-          <Button>Split Minting Funds</Button>
-        </div>
+        {hasAccess.revoke ? (
+          <div>
+           <ResolveData />
+           <div className="grid grid-cols-2 gap-8">
+             <Button>Resolve Attestations</Button>
+             <Button>Split Minting Funds</Button>
+           </div>
+           </div>
+        ): (
+          <span>No access </span>
+        )}
+       
       </TabsContent>
     </Tabs>
   );

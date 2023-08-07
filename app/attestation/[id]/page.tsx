@@ -6,7 +6,7 @@ import { CONTRACTS } from "@/constants/contracts";
 import { readContract } from "@wagmi/core";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Address, useAccount } from "wagmi";
+import { useAccount } from "wagmi";
 import AttestionDetails from "./attestion-details";
 export default function AttestationPage({
   params,
@@ -15,7 +15,11 @@ export default function AttestationPage({
 }) {
   const [data, setData] = useState<any>({});
   const [loading, setLoading] = useState<boolean>(false);
-  const [hasAccess, setHasAccess] = useState<boolean>(false);
+  const [hasAccess, setHasAccess] = useState<any>({
+    revoke: true, 
+    attest: true, 
+    fileAccess: true
+  });
   const {address} = useAccount();
 
   useEffect(() => {
@@ -55,20 +59,43 @@ export default function AttestationPage({
       setData(response.data.data.getSchema);
       //fix schema
       console.log(response.data.data.getSchema);
-      await getAccess(response.data.data.getSchema.resolver);
+      await getAccess();
       setLoading(false);
     };
     
-    const getAccess = async (contract:Address) => {
-      const data = await readContract({
-        address: contract,
-        abi: CONTRACTS.attestation.optimistic.abi,
+    const getAccess = async () => {
+      const fileAccess = await readContract({
+        address: CONTRACTS.attestionFactory.optimistic.contract,
+        abi: CONTRACTS.attestionFactory.optimistic.abi,
         functionName: 'hasAccess',
-        args: [address],
+        args: [params.id, address],
       }) as boolean
       
-      console.log(data)
-      setHasAccess(data)
+      console.log(fileAccess)
+      const revokeAccess = await readContract({
+        address: CONTRACTS.attestionFactory.optimistic.contract,
+        abi: CONTRACTS.attestionFactory.optimistic.abi,
+        functionName: 'hasRevokeAccess',
+        args: [params.id, address],
+      }) as boolean
+      
+      
+      
+      /* const attestAccess = await readContract({
+        address: CONTRACTS.attestionFactory.optimistic.contract,
+        abi: CONTRACTS.attestionFactory.optimistic.abi,
+        functionName: 'hasAttestAccess',
+        args: [params.id, address],
+      }) as boolean
+       */
+
+      setHasAccess({
+        revoke: revokeAccess,
+        attest: true,
+        fileAccess: fileAccess
+      })
+        
+      console.log(revokeAccess, true, fileAccess)
     }
 
     if (params.id, address) {
@@ -106,17 +133,20 @@ export default function AttestationPage({
       </div>
 
       <div>
-        {hasAccess ? (
-           <AttestionDetails
-           attestations={data._count?.attestations}
-           id={params.id}
-           schema={data.schema}
-         />
+        {hasAccess.fileAccess ? (
+           <Button>Already have file access</Button>
           ): (
             <Button>Mint to view attestions 1 ETH</Button>
           )}
        
       </div>
+      
+      <AttestionDetails
+           attestations={data._count?.attestations}
+           id={params.id}
+           schema={data.schema}
+           hasAccess={hasAccess}
+         />
 
      
     </main>

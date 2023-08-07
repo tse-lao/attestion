@@ -105,32 +105,7 @@ export default function AttestionItem({ attestation}: {attestation?: any}) {
       <h3 className="text-green-300">Schema properties</h3>
       <SchemaList list={data.schema} />
     </div> 
-   
-
-    <div className="grid grid-cols-2 gap-4 items-center justify-center">
-      <Button className="border border-green-400 z-10" onClick={attest}>Attest</Button>
-      <Button className="border border-blue-500 z-10" onClick={revoke}>Revoke</Button>
-    </div>
-    <div className="grid grid-cols-3 gap-2 hidden">
-      <button
-        className="font-bold flex justify-center  px-3 rounded-md py-4 text-center hover:bg-gray-400"
-        onClick={doNothing}
-      >
-        <SettingsIcon />
-      </button>
-      <Link
-        href="/attestation/12"
-        className=" font-bold flex justify-center  px-3 rounded-md py-4 text-center hover:bg-gray-400"
-      >
-        <EditIcon />
-      </Link>
-      <button
-        className=" flex justify-center  py-4 font-bold hover:bg-gray-400   px-3 rounded-md"
-        onClick={doNothing}
-      >
-        <MoreHorizontalIcon />
-      </button>
-    </div>
+  
   </div>
     )
   }
