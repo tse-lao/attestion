@@ -19,9 +19,6 @@ export default function ModalLayout({ title, children, showModal}: { title: stri
     setOpen(e)
 
     
-    if (chain?.id != POLYGON ){
-      switchNetwork?.(POLYGON)
-    }
     
   }
 

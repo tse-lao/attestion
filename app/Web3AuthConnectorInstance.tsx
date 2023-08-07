@@ -14,12 +14,12 @@ export default function Web3AuthConnectorInstance(chains: Chain[]) {
 
   const chainConfig = {
     chainNamespace: CHAIN_NAMESPACES.EIP155,
-    chainId: "0x" + chains[0].id.toString(16),
-    rpcTarget: chains[0].rpcUrls.default.http[0], // This is the public RPC we have added, please pass on your own endpoint while creating an app
-    displayName: chains[0].name,
-    tickerName: chains[0].nativeCurrency?.name,
-    ticker: chains[0].nativeCurrency?.symbol,
-    blockExplorer: chains[0].blockExplorers?.default.url[0] as string,
+    chainId: "0x1a4",
+    rpcTarget: "https://optimism-goerli.public.blastapi.io	", // This is the public RPC we have added, please pass on your own endpoint while creating an app
+    displayName: "Optimistic Goerli",
+    tickerName: "ETH Goerli",
+    ticker: "ETH",
+    blockExplorer: "https://goerli-optimism.etherscan.io/" as string,
   }
 
   const web3AuthInstance = new Web3AuthNoModal({

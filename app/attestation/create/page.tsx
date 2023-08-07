@@ -1,4 +1,5 @@
 "use client";
+import SchemaList from "@/components/core/attestation/schema/schema-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,16 +14,21 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CONTRACTS } from "@/constants/contracts";
 import { MinusIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { Address, usePublicClient } from "wagmi";
-
+import { Address, useContractWrite, usePublicClient } from "wagmi";
 export type RevokerItem = {
   token: string;
   type: string;
   tokenId: string;
-}
+};
+export type SchemaInput = { 
+  name: string;
+  type: string;
+  isArray: string;
+};
 export default function CreateAttestion() {
   const [formData, setFormData] = useState({
     name: "DataPonte First Survey",
@@ -31,16 +37,57 @@ export default function CreateAttestion() {
     attestRevokePeriod: "100",
     attestRevokePenalty: "1000000000000000000",
     resolutionDays: "100",
-    attester: [] as RevokerItem[] ,
+    schemaInput: {
+      name: "", 
+      type: "string", 
+      isArray: "false"
+    } as SchemaInput,
+    schema: "",
+    attester: [] as RevokerItem[],
     revoker: [] as RevokerItem[],
     attesterToken: "0x000000",
     attestorTokenID: "0",
     attestReward: "1000000000000000000",
-    isMintable: true,
+    isMintable: false,
     revokersToken: "0x000000",
     revokersTokenID: "0",
   });
   const publicClient = usePublicClient();
+
+  const { data, isLoading, isSuccess, write } = useContractWrite({
+    address: CONTRACTS.attestionFactory.optimistic.contract,
+    abi: CONTRACTS.attestionFactory.optimistic.abi,
+    functionName: "createSuperSchema",
+  });
+  
+  const addSchemaInput = () => {
+    
+    if(formData.schemaInput.name == "" || formData.schemaInput.type == ""){
+      toast.error("Please fill out the name and type");
+      return;
+    }
+    
+    let newSchema =""
+    if(formData.schema.length < 1){
+      newSchema += `${formData.schemaInput.name} ${formData.schemaInput.type}`
+    }else{
+      newSchema += `,${formData.schemaInput.name} ${formData.schemaInput.type}`
+    }
+    if(formData.schemaInput.isArray == "true"){
+      newSchema += "[]"; 
+    }
+
+    console.log(newSchema);
+    setFormData({
+      ...formData,
+      schema: newSchema,
+      schemaInput: {
+        name: "", 
+        type: "string", 
+        isArray: "false"
+      },
+    });
+  };
 
   const handleChange = (e: any) => {
     setFormData({
@@ -48,14 +95,70 @@ export default function CreateAttestion() {
       [e.target.name]: e.target.value,
     });
   };
+  
+  const handleSchemaChange = (e: any) => {
+    setFormData({
+      ...formData,
+      schemaInput: {
+        ...formData.schemaInput,
+        [e.target.name]: e.target.value,
+      },
+    });
+  };
+  const handleTypeChange = (e:any, type: string) => {
+    if(type == "isArray"){
+      setFormData({
+        ...formData,
+        schemaInput: {
+          ...formData.schemaInput,
+          isArray: e,
+        },
+      });
+      return;
+    };
+    setFormData({
+      ...formData,
+      schemaInput: {
+        ...formData.schemaInput,
+        "type": e,
+      },
+    });
+  }
+  
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
     console.log(formData);
-    toast.success(formData.name + " created successfully");
+
+    //[attestionDays, schema, mintPrice, attestReward, mitnable]
+    let params = [
+      formData.name,
+      
+      formData.description,
+      formData.resolutionDays,
+      formData.schema,
+      0,
+      formData.attestReward,
+      formData.isMintable,
+    ];
+    const tokenGateAddresses = [
+      "0x0000000000000000000000000000000000000000",
+      "0x0000000000000000000000000000000000000000",
+    ];
+    const tokenGateEnum = [0, 0];
+
+    const tokenGateTokenID = [0, 0];
+    write({
+      args: [tokenGateAddresses, tokenGateEnum, tokenGateTokenID, params],
+    });
+
+    if (data) {
+      console.log(data);
+      toast.success("Success");
+    }
   };
 
-  const validateAddress = async (type:string) => {
+  const validateAddress = async (type: string) => {
     let address = formData.attesterToken as Address;
     const wagmiAbi = [
       {
@@ -85,8 +188,7 @@ export default function CreateAttestion() {
     if (erc721 || erc1155) {
       toast.success("ERC721 token found");
       if (type == "attester") {
-        
-        if(formData.attester == null) {
+        if (formData.attester == null) {
           setFormData({
             ...formData,
             attester: [
@@ -101,7 +203,7 @@ export default function CreateAttestion() {
         setFormData({
           ...formData,
           attester: [
-            ...formData.attester || [],
+            ...(formData.attester || []),
             {
               token: address,
               type: erc721 ? "ERC721" : "ERC1155",
@@ -112,10 +214,22 @@ export default function CreateAttestion() {
       }
 
       if (type == "revoker") {
-        if(formData.revoker == null) {
+        if (formData.revoker == null) {
+          setFormData({
+            ...formData,
+            revoker: [
+              {
+                token: address,
+                type: erc721 ? "ERC721" : "ERC1155",
+                tokenId: "",
+              },
+            ],
+          });
+        }
         setFormData({
           ...formData,
           revoker: [
+            ...(formData.revoker || []),
             {
               token: address,
               type: erc721 ? "ERC721" : "ERC1155",
@@ -124,19 +238,7 @@ export default function CreateAttestion() {
           ],
         });
       }
-      setFormData({
-        ...formData,
-        revoker: [
-          ...formData.revoker || [],
-          {
-            token: address,
-            type: erc721 ? "ERC721" : "ERC1155",
-            tokenId: "",
-          },
-        ],
-      });
     }
-  }
   };
   return (
     <main>
@@ -166,6 +268,47 @@ export default function CreateAttestion() {
               required={true}
             />
           </div>
+          <div className="grid w-full grid-cols-6 items-center gap-2">
+            <Input
+              name="name"
+              type="text"
+              value={formData.schemaInput.name}
+              onChange={handleSchemaChange}
+              placeholder="Enter name"
+              required={true}
+              className="col-span-2"
+            />
+            <Select name="type"  defaultValue={formData.schemaInput.type} onValueChange={(e) => handleTypeChange(e, "type")}>
+                <SelectTrigger className="w-full"  >
+                  <SelectValue placeholder="Select inputtype"   />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Select your input type</SelectLabel>
+                    <SelectItem value="string">String</SelectItem>
+                    <SelectItem value="number">Number</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            <div className="flex items-center gap-2">
+              
+            <Select name="isArray"  defaultValue={formData.schemaInput.isArray.toString()} onValueChange={(e) => handleTypeChange(e, "isArray")}>
+                <SelectTrigger className="w-full"  >
+                  <SelectValue placeholder="Select inputtype"   />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value={"false"}>Single</SelectItem>
+                    <SelectItem value={"true"}>Array</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button className="bg-green-300" onClick={addSchemaInput}>
+              <PlusIcon className="h-5 w-5" />
+            </Button>
+          </div>
+          <SchemaList list={formData.schema} />
           <div className="grid grid-cols-2 w-full items-center gap-1.5">
             <div className="grid w-full  items-center gap-1.5">
               <Label htmlFor="attestRevokeBond">Attestion Revoke bond</Label>
@@ -197,8 +340,8 @@ export default function CreateAttestion() {
             <div className="col-span-1">
               <Label htmlFor="picture">Mintable</Label>
               <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Mintable" />
+                <SelectTrigger className="w-full"   name="isMintable" value={formData.isMintable.toString()} onChange={handleChange}>
+                  <SelectValue  placeholder="Mintable"   />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -245,7 +388,10 @@ export default function CreateAttestion() {
             </div>
           </div>
           {formData.attester?.map((attester, index) => (
-            <div key={index} className="grid grid-cols-6 w-full  items-center gap-1.5">
+            <div
+              key={index}
+              className="grid grid-cols-6 w-full  items-center gap-1.5"
+            >
               <div className="grid col-span-2">
                 <Label htmlFor="address">Token address</Label>
                 <span className="overflow-auto text-xs">
@@ -267,7 +413,7 @@ export default function CreateAttestion() {
                 <Button className="bg-red-300">
                   <MinusIcon />
                 </Button>
-                </div>
+              </div>
             </div>
           ))}
           <div className="grid w-full  items-center gap-1.5">
@@ -293,12 +439,15 @@ export default function CreateAttestion() {
             </div>
           </div>
           {formData.revoker?.map((revoker, index) => (
-            <div key={index} className="grid grid-cols-6 w-full  items-center gap-1.5">
+            <div
+              key={index}
+              className="grid grid-cols-6 w-full  items-center gap-1.5"
+            >
               <div className="grid col-span-2">
-                <Label htmlFor="address" className="text-green-300">{revoker.type}</Label>
-                <span className="overflow-auto text-xs">
-                  {revoker.token}
-                </span>
+                <Label htmlFor="address" className="text-green-300">
+                  {revoker.type}
+                </Label>
+                <span className="overflow-auto text-xs">{revoker.token}</span>
               </div>
               <div className="col-span-3 overflow-auto w-full">
                 <Label htmlFor="revokerTokenID">Token IDs</Label>
@@ -315,7 +464,7 @@ export default function CreateAttestion() {
                 <Button className="bg-red-300">
                   <MinusIcon />
                 </Button>
-                </div>
+              </div>
             </div>
           ))}
 

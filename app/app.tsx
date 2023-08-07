@@ -6,7 +6,9 @@ import { Chain, WagmiConfig, configureChains, createConfig } from "wagmi";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { publicProvider } from "wagmi/providers/public";
 
+
 import { AddressWrapper } from "@/components/core/account/address-wrapper";
+import { optimismGoerli } from "wagmi/chains";
 import Web3AuthConnectorInstance from "./Web3AuthConnectorInstance";
 import Navbar from "./nav-bar";
 
@@ -52,7 +54,7 @@ export const polygonMumbai = {
   testnet: true,
 } as const satisfies Chain;
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [polygonMumbai],
+  [optimismGoerli,polygonMumbai],
   [publicProvider()]
 );
 

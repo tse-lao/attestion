@@ -10,6 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table"
 
+import { Button } from "@/components/ui/button"
 import { DataTablePagination } from "@/components/ui/data-table-pagination"
 import {
   Table,
@@ -98,6 +99,9 @@ export function ResolveTable<TData, TValue>({
     </div>
     <div className="flex items-center justify-end space-x-2 py-4">
       <DataTablePagination table={table} />
+    </div>
+    <div className="text-right">
+      {table.getFilteredSelectedRowModel().rows.length  > 0 && <Button>Resolve ({table.getFilteredSelectedRowModel().rows.length}) issues</Button>}
     </div>
     </div>
   )
