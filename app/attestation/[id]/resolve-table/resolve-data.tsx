@@ -1,4 +1,5 @@
 "use client";
+import Loading from "@/components/core/loading/loading";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Attestion, resolveColumns } from "./resolve-columns";
@@ -10,11 +11,6 @@ export default function ResolveData({id, attestations}: {id: string, attestation
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function getData() {
-      let unixTimestamp = Math.floor(Date.now() / 1000);
-      let newTimestamp = unixTimestamp + 1000000;
-      // Fetch data from your API here.
-      
       const getData = async () => {
         const baseURL = `https://optimism-goerli.easscan.org/graphql`;
         const response = await axios.post<any>(
@@ -67,7 +63,19 @@ export default function ResolveData({id, attestations}: {id: string, attestation
           }
         );
        
-        setData(response.data.data.getSchema)
+        
+
+        let attestationsList =  response.data.data.getSchema.attestations;
+        const newTimestamp = new Date().getTime();
+        const resolutionTime = 1000 * 60 * 60 * 24 * 30;
+        for(let i = 0; i < attestationsList.length; i++){
+          if(attestationsList.timeCreated + resolutionTime < newTimestamp){
+            attestationsList.splice(i, 1)
+          }
+        
+        }
+        setData(response.data.data.getSchema.attestations)
+        
         //fix schema 
         console.log(response.data.data.getSchema)
         setLoading(false)
@@ -81,59 +89,13 @@ export default function ResolveData({id, attestations}: {id: string, attestation
       }
       getData()
     }
-      
-      setData([
-        {
-          id: "1",
-          name: "John Doe",
-          tags: "tag1, tag2, tag3",
-          cid: "cid001",
-          status: "attested",
-          time: newTimestamp,
-        },
-        {
-          id: "2",
-          name: "Jane Smith",
-          tags: "tag4, tag5, tag6",
-          cid: "cid002",
-          status: "revoked",
-          time: newTimestamp
-        },
-        {
-          id: "3",
-          name: "Bob Johnson",
-          tags: "tag7, tag8, tag9",
-          cid: "cid003",
-          status: "finished",
-          time: newTimestamp +1000
-        },
-        {
-          id: "4",
-          name: "Alice Williams",
-          tags: "tag10, tag11, tag12",
-          cid: "cid004",
-          status: "attested",
-          time: newTimestamp -500
-        },
-        {
-          id: "5",
-          name: "Charlie Brown",
-          tags: "tag13, tag14, tag15",
-          cid: "cid005",
-          "status": "revoked",
-          time: newTimestamp -1000
-        }
-      ]
-      );
-      
 
-    }
 
-  }, []);
+  }, [attestations, id]);
 
   return (
     <div className="container mx-auto py-10">
-      {loading ? <div>Loading...</div> :       <ResolveTable columns={resolveColumns} data={data} />
+      {loading ? <Loading /> : <ResolveTable columns={resolveColumns} data={data} />
 }
     </div>
   );

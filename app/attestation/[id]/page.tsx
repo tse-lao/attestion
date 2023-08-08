@@ -1,12 +1,15 @@
 "use client";
 import AccessType from "@/components/core/attestation/access-type";
 import SchemaList from "@/components/core/attestation/schema/schema-list";
+import Loading from "@/components/core/loading/loading";
 import { Button } from "@/components/ui/button";
 import { CONTRACTS } from "@/constants/contracts";
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
+import { ReloadIcon } from "@radix-ui/react-icons";
 import { readContract } from "@wagmi/core";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useAccount } from "wagmi";
+import { useAccount, useContractWrite } from "wagmi";
 import AttestionDetails from "./attestion-details";
 export default function AttestationPage({
   params,
@@ -14,6 +17,9 @@ export default function AttestationPage({
   params: { id: string };
 }) {
   const [data, setData] = useState<any>({});
+  const [details, setDetails]= useState<any>({
+    mintPrice: 0,
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [hasAccess, setHasAccess] = useState<any>({
     revoke: true, 
@@ -21,9 +27,57 @@ export default function AttestationPage({
     fileAccess: true
   });
   const {address} = useAccount();
+  const {
+  isLoading: minting,
+  write: mint,
+} = useContractWrite({
+  address: CONTRACTS.attestionFactory.optimistic.contract,
+  abi: CONTRACTS.attestionFactory.optimistic.abi,
+  functionName: "mint",
+  args: [details.mintPrice, details.schemaUID],
+  
+});
+
 
   useEffect(() => {
-    const getData = async () => {
+    const getDetails = async () => {
+      const APIURL = "https://api.studio.thegraph.com/query/49385/attestations/version/latest";
+        const tokensQuery = gql`
+        query SchemaByUID($id: String!) {
+            schemaRegistered(id: $id){
+                id
+                name
+                description
+                isMintable
+                mintPrice
+                attestResolutionDays
+                schemaUID
+                transactionHash
+                resolver
+                attestReward
+            }
+        }`;
+
+        const client = new ApolloClient({
+            uri: APIURL,
+            cache: new InMemoryCache(),
+        });
+        
+        client.query({
+            query: tokensQuery,
+            variables: { id: params.id } // Replace 'YOUR_SCHEMA_UID_VALUE' with your actual value
+        })
+        .then(data => {
+            console.log("Subgraph data: ", data);
+            setDetails(data.data.schemaRegistered);
+            getData(data.data.schemaRegistered.schemaUID)
+        })
+        .catch(err => {
+            console.log("Error fetching data: ", err);
+        })
+
+    }
+    const getData = async (schemaUID:string) => {
       const baseURL = `https://optimism-goerli.easscan.org/graphql`;
       const response = await axios.post<any>(
         `${baseURL}/graphql`,
@@ -45,7 +99,7 @@ export default function AttestationPage({
           }`,
           variables: {
             where: {
-              id: params.id,
+              id: schemaUID,
             },
           },
         },
@@ -59,16 +113,20 @@ export default function AttestationPage({
       setData(response.data.data.getSchema);
       //fix schema
       console.log(response.data.data.getSchema);
-      await getAccess();
+      await getAccess(schemaUID);
+      
       setLoading(false);
+      
     };
     
-    const getAccess = async () => {
+    //get data from own GRAPH. 
+    
+    const getAccess = async (schemaUID:string) => {
       const fileAccess = await readContract({
         address: CONTRACTS.attestionFactory.optimistic.contract,
         abi: CONTRACTS.attestionFactory.optimistic.abi,
         functionName: 'hasAccess',
-        args: [params.id, address],
+        args: [schemaUID, address],
       }) as boolean
       
       console.log(fileAccess)
@@ -76,7 +134,7 @@ export default function AttestationPage({
         address: CONTRACTS.attestionFactory.optimistic.contract,
         abi: CONTRACTS.attestionFactory.optimistic.abi,
         functionName: 'hasRevokeAccess',
-        args: [params.id, address],
+        args: [schemaUID, address],
       }) as boolean
       
       
@@ -100,22 +158,19 @@ export default function AttestationPage({
 
     if (params.id, address) {
       setLoading(true);
-      getData();
+      getDetails();
     }
   }, [params, address]);
 
-  if (loading) return <span>Loading..</span>;
+  if (loading) return <Loading />;
   return (
     <main className="flex flex-col items-center text-left gap-8 m-12">
       <div className="max-w-2xl flex flex-col gap-4 items-center text-gray-300">
         <h1 className="text-left text-2xl tracking-wider font-light text-green-300">
-          Name of the attestation
+          {details.name}
         </h1>
         <span className="text-sm text-left">
-          Lorem ipsum dolor, sit amet consectetur adipisicing elit. Natus porro
-          tempore quod amet sunt architecto quas sit ratione unde reiciendis
-          quaerat, ipsa vitae nemo earum, nam asperiores explicabo temporibus.
-          Asperiores.
+          {details.description}
         </span>
 
         <div className="flex flex-col gap-4 w-full text-left mt-4">
@@ -133,19 +188,26 @@ export default function AttestationPage({
       </div>
 
       <div>
+        
         {hasAccess.fileAccess ? (
            <Button>Already have file access</Button>
+          ): details.isMintable ?(
+            <Button onClick={() => mint()} disabled={minting}>
+              {minting ? <><ReloadIcon /> Minting..</> : "Mint to view attestions"}
+              Mint to view attestions {details.mintPrice} ETH
+            </Button>
           ): (
-            <Button>Mint to view attestions 1 ETH</Button>
+            <Button disabled>Private DataPool</Button>
           )}
        
       </div>
       
       <AttestionDetails
            attestations={data._count?.attestations}
-           id={params.id}
+           id={data.id}
            schema={data.schema}
            hasAccess={hasAccess}
+            details={details} 
          />
 
      

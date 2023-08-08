@@ -1,4 +1,5 @@
 "use client";
+import Loading from "@/components/core/loading/loading";
 import { useEffect, useState } from "react";
 import { Attestion, voteColumn } from "./vote-columns";
 import { VoteTable } from "./vote-table";
@@ -63,7 +64,7 @@ export default function VoteData() {
 
   return (
     <div className="container mx-auto py-10">
-      {loading ? <div>Loading...</div> :       <VoteTable columns={voteColumn} data={data} />
+      {loading ? <Loading /> :       <VoteTable columns={voteColumn} data={data} />
 }
     </div>
   );

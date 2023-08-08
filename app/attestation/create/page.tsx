@@ -290,7 +290,7 @@ export default function CreateAttestion() {
               defaultValue={formData.schemaInput.type}
               onValueChange={(e) => handleTypeChange(e, "type")}
             >
-              <SelectTrigger className="w-full col-span-2li">
+              <SelectTrigger className="w-full col-span-2">
                 <SelectValue placeholder="Select inputtype" />
               </SelectTrigger>
               <SelectContent>
@@ -298,7 +298,7 @@ export default function CreateAttestion() {
                   <SelectLabel>Select your input type</SelectLabel>
                   <SelectItem value="string">String</SelectItem>
                   <SelectItem value="uint256">Number</SelectItem>
-                  <SelectItem value="bytes32">File</SelectItem>
+                  <SelectItem value="bytes">File</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -421,7 +421,9 @@ export default function CreateAttestion() {
                   <SelectGroup className="text-sm">
                     <SelectItem value="0">Anyone</SelectItem>
                     <SelectItem value="4">Token</SelectItem>
-                    <SelectItem value="5">MultiToken</SelectItem>
+                    <SelectItem value="6">WLD Holders</SelectItem>
+                    <SelectItem value="7" disabled>Sismo Proof</SelectItem>
+                    <SelectItem value="5">Custom</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -498,7 +500,9 @@ export default function CreateAttestion() {
                   <SelectGroup className="text-sm">
                     <SelectItem value="0">Anyone</SelectItem>
                     <SelectItem value="4">Token</SelectItem>
-                    <SelectItem value="5">MultiToken</SelectItem>
+                    <SelectItem value="6">WLD Holders</SelectItem>
+                    <SelectItem value="7" disabled>Sismo Proof</SelectItem>
+                    <SelectItem value="5">Custom</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -509,7 +513,7 @@ export default function CreateAttestion() {
                 <Input
                   name="revokerToken"
                   type="text"
-                  value={formData.attesterToken}
+                  value={formData.revokerToken}
                   onChange={handleChange}
                   className="text-sm"
                   placeholder="Add attestation token address (ERC721 or ERC1155)"

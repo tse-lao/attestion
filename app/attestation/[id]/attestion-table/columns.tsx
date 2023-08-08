@@ -16,16 +16,16 @@ export type Attestion = {
 
 export const AttestionColumns: ColumnDef<any>[] = [
   {
-    accessorKey: "id",
-    header: "Id",
+    accessorKey: "Attester",
+    header: "attestest",
   },
   {
-    accessorKey: "name",
-    header: "name",
+    accessorKey: "Data",
+    header: "Data",
   },
   {
-    accessorKey: "file",
-    header: "file",
+    accessorKey: "time",
+    header: "Status",
   },
   {
     accessorKey: "tags",

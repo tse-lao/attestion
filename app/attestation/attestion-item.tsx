@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
 export function AttestionAccess() {
   return (
@@ -21,18 +20,6 @@ export function AttestionAccess() {
 
 export default function AttestionItem({ attestation}: {attestation?: any}) {
   const [data, setData] = useState<any>({})
-
-  const doNothing = () => {
-    console.log("clicked");
-  };
-  
-  const attest = () => {
-    toast.success("Attestation Access Granted");
-  }
-  
-  const revoke = () => {
-    toast.error("Attestation Access Revoked");
-  }
   
   useEffect(() => {
     const getData = async () => {
@@ -84,7 +71,7 @@ export default function AttestionItem({ attestation}: {attestation?: any}) {
     return (
       <div className="bg-gray-600 rounded-md p-4 flex flex-col gap-4 hover:outline hover:outline-green-300" >
       <div className="flex justify-between pt-4 px-4">
-          <Link className="text-xl text-white hover:text-green-300" href={`/attestation/${attestation.schemaUID}`} >{attestation.name}</Link>
+          <Link className="text-xl text-white hover:text-green-300" href={`/attestation/${attestation.id}`} >{attestation.name}</Link>
           <MoreVerticalIcon className="text-gray-400 hover:text-gray-50 z-10 cursor-pointer" />
       </div>
       <div>
@@ -100,6 +87,22 @@ export default function AttestionItem({ attestation}: {attestation?: any}) {
       <h3 className="text-green-300">Schema properties</h3>
       <SchemaList list={data.schema} />
     </div> 
+    
+    <div className="grid grid-cols-4">
+      <div>
+        {data.attestResolutionDays}
+      </div>
+      <div>
+        {data.isMintable}
+      </div>
+      <div>
+        {data.mintPrice}
+      </div>
+      <div>
+        {data.attestReward}
+      </div>
+    </div>
+
   
   </div>
     )

@@ -1,6 +1,5 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
@@ -19,18 +18,14 @@ export type Attestion = {
 
 export const resolveColumns: ColumnDef<Attestion>[] = [
   {
-    accessorKey: "id",
-    header: "Id",
-  },
-  {
-    accessorKey: "name",
+    accessorKey: "attester",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Attester
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       )
@@ -38,25 +33,14 @@ export const resolveColumns: ColumnDef<Attestion>[] = [
   },
   
   {
-    accessorKey: "cid",
-    header: "Cid",
+    accessorKey: "decodedDataJson",
+    header: "decodedDataJson",
   },
   {
-    accessorKey: "tags",
-    header: "Tags",
+    accessorKey: "timeCreated",
+    header: "timeCreated",
     cell: ({ row }) => {
-      const tags = row.getValue("tags") as string;
-      const tagArray = tags.split(",") as [];
-
-      return tagArray.map((tag, i) => <Badge key={i} >{tag}</Badge>);
-
-    }
-  },
-  {
-    accessorKey: "time",
-    header: "Time",
-    cell: ({ row }) => {
-      const futureTimestamp = parseFloat(row.getValue("time"))
+      const futureTimestamp = parseFloat(row.getValue("timeCreated"))
       let countdownInterval:any = setInterval(() => {
         let currentTimestamp = Math.floor(Date.now() / 1000);
         let secondsLeft = futureTimestamp - currentTimestamp;

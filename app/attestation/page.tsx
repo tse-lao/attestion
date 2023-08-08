@@ -1,4 +1,5 @@
 "use client"
+import Loading from "@/components/core/loading/loading";
 import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { useEffect, useState } from "react";
 import AttestionItem from "./attestion-item";
@@ -25,6 +26,10 @@ export default  function Attestions() {
         name
         description
         schemaUID
+        attestResolutionDays
+        isMintable
+        mintPrice
+        attestReward
       }
     }
   `;
@@ -49,7 +54,7 @@ export default  function Attestions() {
       setLoading(false)
   }
 
-  if(loading) return <span>Loading..</span>;
+  if(loading) return <Loading />
 
   return (
     <main className="m-12">

@@ -20,8 +20,8 @@ export const voteColumn: ColumnDef<Attestion>[] = [
     header: "Id",
   },
   {
-    accessorKey: "name",
-    header: "name",
+    accessorKey: "attester",
+    header: "attester",
   },
   {
     accessorKey: "cid",
