@@ -161,8 +161,8 @@ export default function AttestionDetails({
             <CardTitle className="text-gray-300 tracking-wider font-light">
               Create Attestation
             </CardTitle>
-            <CardDescription className="text-white">
-              Attestion bond: 1.0 ETH
+            <CardDescription className="text-green-300">
+              Reward {details.attestReward} ETH
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">

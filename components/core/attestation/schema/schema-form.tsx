@@ -1,13 +1,14 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { useEthersSigner } from "@/lib/ethers";
 import { getLighthouseKeys } from "@/lib/lighthouse";
 
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { Label } from "@radix-ui/react-label";
 import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
 
@@ -24,12 +25,17 @@ export default function SchemaForm({
   schemaUID: string;
 }) {
   const [schema, setSchema] = useState<SchemaInput[]>([]);
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<any>({
+    name: "", 
+    file: "", 
+    description: "",
+    
+  });
   const signer = useEthersSigner();
   const {address} = useAccount();
   
 
-  useEffect(() => {
+/*   useEffect(() => {
     console.log(list);
 
     if (list) {
@@ -50,7 +56,7 @@ export default function SchemaForm({
       });
     }
   }, [list]);
-
+ */
   const handleChange = (e: any) => {
     const { name, value } = e.target;
     setSchema((prev: any) =>
@@ -86,7 +92,7 @@ export default function SchemaForm({
     };
 
     try {
-      const url = process.env.NEXT_PUBLIC_API || "http://localhost:4000";
+      const url = process.env.NEXT_PUBLIC_API || "https://api.dataponte.com";
       const response = await axios.post(
         `${url}/files/uploadFile`,
         formData,
@@ -95,11 +101,7 @@ export default function SchemaForm({
       
       toast.success("File uploaded successfully");
       const hash = response.data.Hash;
-      setSchema((prev: any) =>
-        prev.map((item: any) =>
-          item.name === name ? { ...item, hash } : item
-        )
-      );
+      setFormData((prev: any) => ({ ...prev, file: hash }));
     } catch (err) {
       toast.error("Something went wrong when uploading the file");
       throw err;
@@ -139,46 +141,39 @@ export default function SchemaForm({
 
   return (
     <div className="w-full flex flex-col gap-4">
-      {schema.map(
-        (item, index) =>
-          (item.type === "string" && (
-            <div key={index}>
-              <Label>{item.name}</Label>
+      <div>
+              <Label>Name</Label>
               <Input
-                name={item.name}
-                type="text"
-                required
+              name="name"
+              type="text"
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Name"
+              required={true}
+            />
+            </div>
+            <div>
+              <Label>Upload Data</Label>
+              <Input
+              name="name"
+              type="file"
+              value={formData.name}
+              onChange={handleFileChange}
+              placeholder="Name"
+              required={true}
+            />
+            </div>
+            <div>
+              <Label>Description</Label>
+              <Textarea
+                name="name"
+                rows={3}
+                value={formData.description}
                 onChange={handleChange}
-                className="block w-full p-2 border rounded-md"
-              />
-            </div>
-          )) ||
-          (item.type === "uint256" && (
-            <div key={index}>
-              <Label>{item.name}</Label>
-              <Input
-                name={item.name}
-                type="number"
-                onChange={handleChange}
-                required
-                className="block w-full p-2 border rounded-md"
-              />
-            </div>
-          )) ||
-          (item.type === "bytes32" && (
-            <div key={index}>
-              <Label>{item.name}</Label>
-              <Input
-                name={item.name}
-                type="file"
-                onChange={handleFileChange}
-                required
-                className="block w-full p-2 border rounded-md"
-              />
-            </div>
-          ))
-      )}
+                placeholder="Name"
 
+              />
+            </div>
       <Button onClick={submitData}>Submit data</Button>
     </div>
   );

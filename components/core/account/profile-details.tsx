@@ -3,10 +3,10 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import { useAccount, useDisconnect } from 'wagmi';
+import { formatEther } from 'viem';
+import { useAccount, useDisconnect, useNetwork } from 'wagmi';
 
-import { Address, createPublicClient, formatEther, http } from 'viem';
-import { filecoinCalibration, polygonMumbai } from "wagmi/chains";
+import { Address, createPublicClient, http } from 'viem';
 
 
 import { CopyIcon, Download, LogOutIcon, PlusIcon, RecycleIcon, SettingsIcon, Wallet2Icon } from 'lucide-react';
@@ -18,9 +18,10 @@ import ProfileBalance from './profile-balance';
 export default function ProfileDetails({ showModal, open, setShowModal }: any) {
 
     const { disconnect } = useDisconnect();
-    const [maticBalance, setMaticBalance] = useState("");
-    const [fileBalance, setFileBalance] = useState("0");
     const [loading, setLoading] = useState(true);
+    //get all the chains configered from wagmi
+    const { chain, chains } = useNetwork()
+    const [balances, setBalances] = useState<any>([]);
 
 
     const { address: account, isConnected } =
@@ -29,37 +30,39 @@ export default function ProfileDetails({ showModal, open, setShowModal }: any) {
 
     useEffect(() => {
         async function getBalances() {
-            const client = createPublicClient({
-                chain: polygonMumbai,
-                transport: http('https://rpc-mumbai.maticvigil.com')
-            });
-            const filecoinClient = createPublicClient({
-                chain: filecoinCalibration,
-                transport: http('https://filecoin-calibration.chainup.net/rpc/v1')
-            });
-        
-            const getMaticBalance: bigint = await client.getBalance({
-                address:account as Address
-            })
-        
-            const formatBalance: string = formatEther(getMaticBalance);
-            setMaticBalance(formatBalance);
-        
-            const filecoinBalance = await filecoinClient.getBalance({
-                address: account as Address
-            })
-        
-            const formatBalanceFilecoin: string = formatEther(filecoinBalance);
-            setFileBalance(formatBalanceFilecoin);
+            
+            console.log(chain)
+            for(let i=0; i<chains.length; i++){
+                const client = createPublicClient({
+                    chain: chains[i],
+                    transport: http(chains[i].rpcUrls.default.http[0])
+                });
+    
+                let getBalance:any = await client.getBalance({
+                    address:account as Address
+                })
+                
+                getBalance = formatEther(getBalance)
+
+    
+                if(i == 0){
+                    setBalances([{chain: chains[i], balance: getBalance, active: chain?.id == chains[i].id}])
+                }else {
+                    setBalances((prev: any) => [...prev, {chain: chains[i], balance: formatEther(getBalance), active: chain?.id == chains[i].id}])
+                }
+            }
+
         
         
         }
     
-        getBalances();
+        if(account && chains){
+            getBalances();
+            setLoading(false)
+        }
         
-        setLoading(false)
 
-}, [account]);
+}, [account, chains,chain]);
 
 
 
@@ -102,9 +105,12 @@ return (
                     </div>
                 </div>
                 <div id="balances" className='grid grid-cols-1 py-4 gap-4'>
+                    {balances.map((balance: any, key: number) => (
 
-                    <ProfileBalance loading={loading} token="filecoin" balance={fileBalance} />
-                    <ProfileBalance loading={loading} token="matic" balance={maticBalance} />
+                             <ProfileBalance key={key} loading={loading} token={balance.chain} balance={balance.balance} active={balance.active} />
+
+                   
+                    ))}
 
                 </div>
                 <div className="grid grid-cols-3 p-4 gap-2">
