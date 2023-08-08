@@ -10,6 +10,9 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import SchemaForm from "@/components/core/attestation/schema/schema-form";
+import { CONTRACTS } from "@/constants/contracts";
+import { ReloadIcon } from "@radix-ui/react-icons";
+import { useContractWrite } from "wagmi";
 import AttestionData from "./attestion-table/attestion-data";
 import ResolveData from "./resolve-table/resolve-data";
 
@@ -24,6 +27,17 @@ export default function AttestionDetails({
   schema: any;
   hasAccess: any;
 }) {
+  
+  const { data:resolveData, isLoading:resolveLoading, isSuccess:resolveSuccess, write:resolve } = useContractWrite({
+    address: CONTRACTS.attestation.optimistic.contract,
+    abi: CONTRACTS.attestation.optimistic.abi,
+    functionName: 'resolveAttestations',
+  })
+  const { data:splitData, isLoading:splitLoading, isSuccess:splitSuccess, write:splitFunds } = useContractWrite({
+    address: CONTRACTS.attestation.optimistic.contract,
+    abi: CONTRACTS.attestation.optimistic.abi,
+    functionName: 'splitMintingFunds',
+  })
   
 
   return (
@@ -61,8 +75,14 @@ export default function AttestionDetails({
           <div>
             <ResolveData id={id} attestations={attestations}/>
            <div className="grid grid-cols-2 gap-8">
-             <Button>Resolve Attestations</Button>
-             <Button>Split Minting Funds</Button>
+             <Button onClick={() => {resolve()}} disabled={resolveLoading}>
+              {resolveLoading ? <><ReloadIcon className="mr-2 h-4 w-4 animate-spin" /> Resolving...</> : 'Resolve Attestations'}
+              
+            </Button>
+             <Button onClick={() => {splitFunds()}} disabled={splitLoading}>
+             {splitLoading ? <><ReloadIcon className="mr-2 h-4 w-4 animate-spin" /> Splitting...</> : 'Splitting Funds'}
+
+            </Button>
            </div>
            </div>
         ): (

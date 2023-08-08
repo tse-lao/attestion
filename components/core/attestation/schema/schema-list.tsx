@@ -11,11 +11,17 @@ export default function SchemaList({list}: {list?: string}) {
         console.log(list)
         
         if(list){
-            list.split(",").map((listItem: string) => {
-                listItem.split(",").map((item: string) => {
-                    const [type, name] = listItem.split(" ")
+            list.split(",").map((listItem: string, index:number) => {
+                    
+                    if(index > 0){
+                        const [empty, type, name] = listItem.split(" ")
                     setSchema((prev) => [...prev, {name, type}])
-                })  
+                    }else{
+                        const [type, name] = listItem.split(" ")
+                    setSchema((prev) => [...prev, {name, type}])
+                    }
+                    
+
             });
         }
     }, [list])

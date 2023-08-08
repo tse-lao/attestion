@@ -16,7 +16,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { CONTRACTS } from "@/constants/contracts";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { MinusIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { Address, useContractWrite, usePublicClient } from "wagmi";
@@ -44,15 +44,15 @@ export default function CreateAttestion() {
       type: "string",
       isArray: "false",
     } as SchemaInput,
-    schema: "",
-    attester: [] as RevokerItem[],
-    revoker: [] as RevokerItem[],
-    attesterToken: "0x000000",
-    attestorTokenID: "0",
+    schema: "name string, tags string[]",
+    attesterToken: "0x0000000000000000000000000000000000000000",
+    attesterTokenID: 0,
+    attesterStatus: 0,
     attestReward: 1,
     isMintable: false,
-    revokersToken: "0x000000",
-    revokersTokenID: "0",
+    revokerToken: "0x0000000000000000000000000000000000000000",
+    revokerTokenID: 0,
+    revokerStatus: 0,
   });
   const publicClient = usePublicClient();
 
@@ -62,6 +62,7 @@ export default function CreateAttestion() {
     functionName: "createSuperSchema",
   });
 
+  
   const addSchemaInput = () => {
     if (formData.schemaInput.name == "" || formData.schemaInput.type == "") {
       toast.error("Please fill out the name and type");
@@ -146,13 +147,13 @@ export default function CreateAttestion() {
       formData.attestReward,
       formData.isMintable,
     ];
-    const tokenGateAddresses = [
-      "0x0000000000000000000000000000000000000000",
-      "0x0000000000000000000000000000000000000000",
-    ];
-    const tokenGateEnum = [0, 0];
+    const tokenGateAddresses = [formData.attesterToken, formData.revokerToken];
 
-    const tokenGateTokenID = [0, 0];
+    const tokenGateEnum = [formData.attesterStatus, formData.revokerStatus];
+    const tokenGateTokenID = [
+      formData.attesterTokenID,
+      formData.revokerTokenID,
+    ];
     write({
       args: [tokenGateAddresses, tokenGateEnum, tokenGateTokenID, params],
     });
@@ -164,19 +165,39 @@ export default function CreateAttestion() {
   };
 
   const changeMintable = (e: any) => {
-    
-    if(e == "true"){
+    if (e == "true") {
       setFormData({
         ...formData,
         isMintable: true,
         attestReward: 0,
       });
-      return; 
-    }else{
+      return;
+    } else {
       setFormData({
         ...formData,
         isMintable: false,
         mintPrice: 0,
+      });
+      return;
+    }
+  };
+
+  const changeSelect = (e: any, type: string) => {
+    if (type == "attesterStatus") {
+      setFormData({
+        ...formData,
+        attesterStatus: e,
+        attesterTokenID: 0,
+        attesterToken: "0x0000000000000000000000000000000000000000",
+      });
+      return;
+    }
+    if (type == "revokerStatus") {
+      setFormData({
+        ...formData,
+        revokerStatus: e,
+        revokerTokenID: 0,
+        revokerToken: "0x0000000000000000000000000000000000000000",
       });
       return;
     }
@@ -212,54 +233,15 @@ export default function CreateAttestion() {
     if (erc721 || erc1155) {
       toast.success("ERC721 token found");
       if (type == "attester") {
-        if (formData.attester == null) {
-          setFormData({
-            ...formData,
-            attester: [
-              {
-                token: address,
-                type: erc721 ? "ERC721" : "ERC1155",
-                tokenId: "",
-              },
-            ],
-          });
-        }
         setFormData({
           ...formData,
-          attester: [
-            ...(formData.attester || []),
-            {
-              token: address,
-              type: erc721 ? "ERC721" : "ERC1155",
-              tokenId: "",
-            },
-          ],
+          attesterStatus: erc721 ? 1 : 2,
         });
       }
-
       if (type == "revoker") {
-        if (formData.revoker == null) {
-          setFormData({
-            ...formData,
-            revoker: [
-              {
-                token: address,
-                type: erc721 ? "ERC721" : "ERC1155",
-                tokenId: "",
-              },
-            ],
-          });
-        }
         setFormData({
           ...formData,
-          revoker: [
-            ...(formData.revoker || []),
-            {
-              token: address,
-              type: erc721 ? "ERC721" : "ERC1155",
-              tokenId: "",
-            },
-          ],
+          revokerStatus: erc721 ? 1 : 2,
         });
       }
     }
@@ -303,11 +285,12 @@ export default function CreateAttestion() {
               className="col-span-2"
             />
             <Select
+              
               name="type"
               defaultValue={formData.schemaInput.type}
               onValueChange={(e) => handleTypeChange(e, "type")}
             >
-              <SelectTrigger className="w-full">
+              <SelectTrigger className="w-full col-span-2li">
                 <SelectValue placeholder="Select inputtype" />
               </SelectTrigger>
               <SelectContent>
@@ -315,6 +298,7 @@ export default function CreateAttestion() {
                   <SelectLabel>Select your input type</SelectLabel>
                   <SelectItem value="string">String</SelectItem>
                   <SelectItem value="uint256">Number</SelectItem>
+                  <SelectItem value="bytes32">File</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -419,108 +403,159 @@ export default function CreateAttestion() {
             )}
           </div>
 
-          <div className="grid w-full  items-center gap-2">
-            <Label htmlFor="attestorToken">Attesters Token</Label>
-            <div className="flex w-full items-center space-x-2">
-              <Input
-                name="attesterToken"
-                type="text"
-                value={formData.attesterToken}
-                onChange={handleChange}
-                placeholder="Add attestation token address (ERC721 or ERC1155)"
-                required={true}
-              />
-              <Button
-                type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  validateAddress("attester");
-                }}
+          <div className="grid grid-cols-7 w-full  items-end gap-2">
+            <div className="col-span-2">
+              <Label htmlFor="picture">Attest Access</Label>
+              <Select
+                defaultValue={formData.attesterStatus.toString()}
+                onValueChange={(e) => changeSelect(e, "attesterStatus")}
               >
-                <PlusIcon />
-              </Button>
+                <SelectTrigger
+                  className="w-full"
+                  name="isMintable"
+                  value={formData.attesterStatus.toString()}
+                >
+                  <SelectValue placeholder="attesterStatus" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup className="text-sm">
+                    <SelectItem value="0">Anyone</SelectItem>
+                    <SelectItem value="4">Token</SelectItem>
+                    <SelectItem value="5">MultiToken</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
-          </div>
-          {formData.attester?.map((attester, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-6 w-full  items-center gap-1.5"
-            >
-              <div className="grid col-span-2">
-                <Label htmlFor="address">Token address</Label>
-                <span className="overflow-auto text-xs">
-                  {attester.token} - {attester.type}
-                </span>
-              </div>
-              <div className="col-span-3 overflow-auto w-full">
-                <Label htmlFor="revokerTokenID">Token IDs</Label>
+            <div className="col-span-4">
+              <Label htmlFor="attestorToken">Attesters Token</Label>
+              <div className="flex w-full items-center space-x-2">
                 <Input
-                  name="revokersTokenID"
-                  type="number"
-                  value={formData.attester[index].tokenId}
+                  name="attesterToken"
+                  type="text"
+                  value={formData.attesterToken}
                   onChange={handleChange}
-                  placeholder="Required for ERC1155"
+                  className="text-sm"
+                  placeholder="Add attestation token address (ERC721 or ERC1155)"
                   required={true}
+                  disabled={formData.attesterStatus < 1}
                 />
               </div>
-              <div className="col-span-1 flex items-end">
-                <Button className="bg-red-300">
-                  <MinusIcon />
-                </Button>
-              </div>
             </div>
-          ))}
-          <div className="grid w-full  items-center gap-1.5">
-            <Label htmlFor="revokersToken">Revokers Address</Label>
-            <div className="flex w-full items-center space-x-2">
-              <Input
-                name="revokersToken"
-                type="text"
-                value={formData.revokersToken}
-                onChange={handleChange}
-                placeholder="Enter Revokers token address (ERC721 or ERC1155)"
-                required={true}
-              />
-              <Button
-                type="submit"
-                onClick={(e) => {
-                  e.preventDefault();
-                  validateAddress("revoker");
-                }}
-              >
-                <PlusIcon />
-              </Button>
+            <div className="col-span-1">
+              {formData.attesterStatus == 4 && (
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    validateAddress("attester");
+                  }}
+                >
+                  <PlusIcon />
+                </Button>
+              )}
+
+              {formData.attesterStatus == 2 && (
+                <Input
+                  name="attesterTokenID"
+                  type="number"
+                  value={formData.attesterTokenID}
+                  onChange={handleChange}
+                  className="text-sm"
+                  placeholder="Required"
+                  required={true}
+                  disabled={formData.attesterStatus < 1}
+                />
+              )}
+              {formData.attesterStatus == 1 && (
+                <Input
+                  name="attesterTokenID"
+                  type="number"
+                  value={formData.attesterTokenID}
+                  onChange={handleChange}
+                  className="text-sm"
+                  placeholder="Optional"
+                  disabled={formData.attesterStatus < 1}
+                />
+              )}
             </div>
           </div>
-          {formData.revoker?.map((revoker, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-6 w-full  items-center gap-1.5"
-            >
-              <div className="grid col-span-2">
-                <Label htmlFor="address" className="text-green-300">
-                  {revoker.type}
-                </Label>
-                <span className="overflow-auto text-xs">{revoker.token}</span>
-              </div>
-              <div className="col-span-3 overflow-auto w-full">
-                <Label htmlFor="revokerTokenID">Token IDs</Label>
+
+          <div className="grid grid-cols-7 w-full  items-end gap-2">
+            <div className="col-span-2">
+              <Label htmlFor="picture">Revoker Access</Label>
+              <Select
+                defaultValue={formData.revokerStatus.toString()}
+                onValueChange={(e) => changeSelect(e, "revokerStatus")}
+              >
+                <SelectTrigger
+                  className="w-full"
+                  name="isMintable"
+                  value={formData.attesterStatus.toString()}
+                >
+                  <SelectValue placeholder="attesterStatus" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup className="text-sm">
+                    <SelectItem value="0">Anyone</SelectItem>
+                    <SelectItem value="4">Token</SelectItem>
+                    <SelectItem value="5">MultiToken</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="col-span-4">
+              <Label htmlFor="attestorToken">Revoker Token</Label>
+              <div className="flex w-full items-center space-x-2">
                 <Input
-                  name="revokersTokenID"
-                  type="number"
-                  value={formData.revoker[index].tokenId}
+                  name="revokerToken"
+                  type="text"
+                  value={formData.attesterToken}
                   onChange={handleChange}
-                  placeholder="Required for ERC1155"
+                  className="text-sm"
+                  placeholder="Add attestation token address (ERC721 or ERC1155)"
                   required={true}
+                  disabled={formData.revokerStatus < 1}
                 />
               </div>
-              <div className="col-span-1 flex items-end">
-                <Button className="bg-red-300">
-                  <MinusIcon />
-                </Button>
-              </div>
             </div>
-          ))}
+            <div className="col-span-1">
+              {formData.revokerStatus == 4 && (
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    validateAddress("revoker");
+                  }}
+                >
+                  <PlusIcon />
+                </Button>
+              )}
+
+              {formData.revokerStatus == 2 && (
+                <Input
+                  name="revokerTokenID"
+                  type="number"
+                  value={formData.revokerTokenID}
+                  onChange={handleChange}
+                  className="text-sm"
+                  placeholder="Required"
+                  required={true}
+                  disabled={formData.revokerStatus < 1}
+                />
+              )}
+              {formData.revokerStatus == 1 && (
+                <Input
+                  name="revokerTokenID"
+                  type="number"
+                  value={formData.revokerTokenID}
+                  onChange={handleChange}
+                  className="text-sm"
+                  placeholder="Optional"
+                  disabled={formData.revokerStatus < 1}
+                />
+              )}
+            </div>
+          </div>
 
           <div className="w-full">
             {isLoading ? (

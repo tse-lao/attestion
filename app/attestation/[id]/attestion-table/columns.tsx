@@ -9,12 +9,12 @@ export type Attestion = {
   id: string
   name: string
   tags: string
-  cid: string
+  file: string
   status: "attested" | "revoked" | "finished"
   email: string
 }
 
-export const AttestionColumns: ColumnDef<Attestion>[] = [
+export const AttestionColumns: ColumnDef<any>[] = [
   {
     accessorKey: "id",
     header: "Id",
@@ -24,8 +24,8 @@ export const AttestionColumns: ColumnDef<Attestion>[] = [
     header: "name",
   },
   {
-    accessorKey: "cid",
-    header: "Cid",
+    accessorKey: "file",
+    header: "file",
   },
   {
     accessorKey: "tags",

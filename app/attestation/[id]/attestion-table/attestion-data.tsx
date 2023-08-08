@@ -16,7 +16,7 @@ export default function AttestionData() {
           "id": "1",
           "name": "John Doe",
           "tags": "tag1, tag2, tag3",
-          "cid": "cid001",
+          "file": "file001",
           "status": "attested",
           "email": "johndoe@example.com"
         },
@@ -24,7 +24,7 @@ export default function AttestionData() {
           "id": "2",
           "name": "Jane Smith",
           "tags": "tag4, tag5, tag6",
-          "cid": "cid002",
+          "file": "file002",
           "status": "revoked",
           "email": "janesmith@example.com"
         },
@@ -32,7 +32,7 @@ export default function AttestionData() {
           "id": "3",
           "name": "Bob Johnson",
           "tags": "tag7, tag8, tag9",
-          "cid": "cid003",
+          "file": "file003",
           "status": "finished",
           "email": "bobjohnson@example.com"
         },
@@ -40,7 +40,7 @@ export default function AttestionData() {
           "id": "4",
           "name": "Alice Williams",
           "tags": "tag10, tag11, tag12",
-          "cid": "cid004",
+          "file": "file004",
           "status": "attested",
           "email": "alicewilliams@example.com"
         },
@@ -48,7 +48,7 @@ export default function AttestionData() {
           "id": "5",
           "name": "Charlie Brown",
           "tags": "tag13, tag14, tag15",
-          "cid": "cid005",
+          "file": "file005",
           "status": "revoked",
           "email": "charliebrown@example.com"
         }
