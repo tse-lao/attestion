@@ -51,12 +51,6 @@ export default function LoginButton() {
   if (!isConnecting && address) {
     return (
       <div className="flex rounded-md  items-center gap-2">
-        <div className='p-2 flex gap-2'>
-          {status === 'connected' &&
-            balance && Math.round(parseInt(balance.formatted) * 100000)/100000
-        }   
-
-        </div>
         <button className=' bg-gray-800 py-1 px-4 outline rounded-md outline-gray-900 text-md overflow truncate tracking-wider hover:outline-indigo-500' onClick={() => setShowModal(!showModal)}>
           {truncateTextMiddle(address, 13)}
           

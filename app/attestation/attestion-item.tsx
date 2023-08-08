@@ -1,13 +1,18 @@
 "use client";
 import AccessType from "@/components/core/attestation/access-type";
-import SchemaList from "@/components/core/attestation/schema/schema-list";
 import axios from "axios";
 import {
+  BookLockIcon,
+  BookOpenCheckIcon,
   CheckIcon,
-  MoreVerticalIcon
+  CoinsIcon,
+  GemIcon,
+  MoreVerticalIcon,
+  TimerIcon
 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { formatEther } from 'viem';
 
 export function AttestionAccess() {
   return (
@@ -18,7 +23,7 @@ export function AttestionAccess() {
   );
 }
 
-export default function AttestionItem({ attestation}: {attestation?: any}) {
+export default function AttestionItem({ schema}: {schema: any}) {
   const [data, setData] = useState<any>({})
   
   useEffect(() => {
@@ -45,7 +50,7 @@ export default function AttestionItem({ attestation}: {attestation?: any}) {
               }`,
             variables: {
               where: {
-                id: attestation.schemaUID,
+                id: schema.schemaUID,
               },
             },
           },
@@ -61,50 +66,38 @@ export default function AttestionItem({ attestation}: {attestation?: any}) {
         console.log(response.data.data.getSchema)
       
     }
-    if(attestation){
+    if(schema){
       getData();
     }
-  }, [attestation])
+  }, [schema])
   
   
-  if(attestation){
+  if(schema){
     return (
-      <div className="bg-gray-600 rounded-md p-4 flex flex-col gap-4 hover:outline hover:outline-green-300" >
+      <Link className="bg-gray-600 rounded-md p-4 flex flex-col gap-4 hover:outline hover:outline-green-300"  href={`/attestation/${schema.id}`}>
       <div className="flex justify-between pt-4 px-4">
-          <Link className="text-xl text-white hover:text-green-300" href={`/attestation/${attestation.id}`} >{attestation.name}</Link>
+          <div className="text-xl text-white hover:text-green-300" >{schema.name}</div>
           <MoreVerticalIcon className="text-gray-400 hover:text-gray-50 z-10 cursor-pointer" />
       </div>
       <div>
       <span className="text-gray-200 italic font-light text-sm m-4">
-        {attestation.description}
+        {schema.description}
        </span>
     </div>
-    <div className="flex flex-col gap-2">
+    <div className="grid md:grid-cols-2 gap-2">
       <AccessType type="Revoke Access" access={false} />
-      <AccessType type="Attestation Access" access={true} />
+      <AccessType type="schema Access" access={true} />
     </div>
-    <div>
-      <h3 className="text-green-300">Schema properties</h3>
-      <SchemaList list={data.schema} />
-    </div> 
     
-    <div className="grid grid-cols-4">
-      <div>
-        {data.attestResolutionDays}
-      </div>
-      <div>
-        {data.isMintable}
-      </div>
-      <div>
-        {data.mintPrice}
-      </div>
-      <div>
-        {data.attestReward}
-      </div>
+    <div className="grid grid-cols-3  m-4 items-center text-center">
+      <IconItem icon={<TimerIcon />} value={schema.attestResolutionDays} />
+      { schema.isMintable ? <IconItem icon={<BookOpenCheckIcon />} value="Open" /> : <IconItem icon={<BookLockIcon />} value="Close" />}
+      { schema.isMintable ? <IconItem icon={<CoinsIcon />} value={formatEther(schema.mintPrice)} /> :  <IconItem icon={<GemIcon />} value={formatEther(schema.attestReward)} />}
+     
     </div>
 
   
-  </div>
+  </Link>
     )
   }
   
@@ -112,3 +105,19 @@ export default function AttestionItem({ attestation}: {attestation?: any}) {
     <span>Something went wrong</span>
   )
 }
+
+export function IconItem({ icon, value }: { icon: any, value: any }) {
+  
+  return(
+    <div className="flex flex-col gap-2 justify-center items-center">
+        <div className="text-green-300">
+        {icon}
+        </div>  
+        <span className="text-gray-200 font-medium tracking-wider text-sm">
+          {value}
+        </span>
+      </div>
+
+  )
+  }  
+        

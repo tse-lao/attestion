@@ -1,5 +1,5 @@
 "use client";
-import SchemaList from "@/components/core/attestation/schema/schema-list";
+import CustomAddress from "@/components/core/attestation/customAddress";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -44,7 +44,7 @@ export default function CreateAttestion() {
       type: "string",
       isArray: "false",
     } as SchemaInput,
-    schema: "name string, tags string[]",
+    schema: "name string, file string, description string",
     attesterToken: "0x0000000000000000000000000000000000000000",
     attesterTokenID: 0,
     attesterStatus: 0,
@@ -54,6 +54,11 @@ export default function CreateAttestion() {
     revokerTokenID: 0,
     revokerStatus: 0,
   });
+  
+  const [customRevokers, setCustomRevokers] = useState<string[]>([]);
+  const [customAttesters, setCustomAttesters] = useState<string[]>([]);
+  const [showAModal, setShowAModal] = useState(false);
+  const [showRModal, setShowRModal] = useState(false);
   const publicClient = usePublicClient();
 
   const { data, isLoading, isSuccess, write } = useContractWrite({
@@ -64,7 +69,7 @@ export default function CreateAttestion() {
 
   
   const addSchemaInput = () => {
-    if (formData.schemaInput.name == "" || formData.schemaInput.type == "") {
+    /* if (formData.schemaInput.name == "" || formData.schemaInput.type == "") {
       toast.error("Please fill out the name and type");
       return;
     }
@@ -94,7 +99,9 @@ export default function CreateAttestion() {
         type: "string",
         isArray: "false",
       },
-    });
+    }); */
+    
+    toast.info("This feature is currently available but should be working soon!");
   };
 
   const handleChange = (e: any) => {
@@ -246,14 +253,27 @@ export default function CreateAttestion() {
       }
     }
   };
+  
+  const addRevokeAddress = (address: string) => {
+
+    setCustomRevokers(prevAddresses => [...prevAddresses, address]);
+
+  }
+  
+  const addAttestAddress = (address: string) => {
+    setCustomAttesters(prevAddresses => [...prevAddresses, address]);
+    
+  }
   return (
     <main>
+      {showRModal && <CustomAddress addresses={customRevokers} addAddress={addRevokeAddress} showModal={showRModal} setShowModal={setShowRModal} />}
+      {showAModal && <CustomAddress addresses={customAttesters} addAddress={addAttestAddress} showModal={showAModal} setShowModal={setShowAModal} />}
       <div className=" p-8 m-12 rounded-md flex flex-col justify-center items-center">
         <h1 className="text-center text-2xl mb-4 text-green-300">
           Create Optimistic Attestation
         </h1>
         <div className="flex flex-col gap-8 bg-gray-600 rounded-md p-12 w-full max-w-2xl">
-          <div className="grid w-full  items-center gap-1.5">
+          <div className="items-center gap-1.5">
             <Label htmlFor="picture">Name</Label>
             <Input
               name="name"
@@ -264,7 +284,7 @@ export default function CreateAttestion() {
               required={true}
             />
           </div>
-          <div className="grid w-full  items-center gap-1.5">
+          <div className="items-center gap-1.5">
             <Label htmlFor="description">Description</Label>
             <Textarea
               name="description"
@@ -274,7 +294,9 @@ export default function CreateAttestion() {
               required={true}
             />
           </div>
-          <div className="grid w-full grid-cols-6 items-center gap-2">
+          <div className="grid grid-cols-6 items-end gap-2">
+            <div  className="col-span-2">
+            <Label htmlFor="resolutionDays">Create Input</Label>
             <Input
               name="name"
               type="text"
@@ -282,15 +304,17 @@ export default function CreateAttestion() {
               onChange={handleSchemaChange}
               placeholder="Enter name"
               required={true}
-              className="col-span-2"
+             
             />
+            </div>
+           
             <Select
               
               name="type"
               defaultValue={formData.schemaInput.type}
               onValueChange={(e) => handleTypeChange(e, "type")}
             >
-              <SelectTrigger className="w-full col-span-2">
+              <SelectTrigger className="w-full col-span-2 bg-gray-300">
                 <SelectValue placeholder="Select inputtype" />
               </SelectTrigger>
               <SelectContent>
@@ -323,22 +347,10 @@ export default function CreateAttestion() {
               <PlusIcon className="h-5 w-5" />
             </Button>
           </div>
-          <SchemaList list={formData.schema} />
-          <div className="grid grid-cols-2 w-full items-center gap-1.5">
-            <div className="grid w-full  items-center gap-1.5">
-              <Label htmlFor="attestRevokeBond">Attestion Revoke bond</Label>
-              <div className="flex w-full items-center space-x-2">
-                <Input
-                  name="attestRevokeBond"
-                  type="text"
-                  value={formData.attestRevokeBond}
-                  onChange={handleChange}
-                  placeholder="Enter bond"
-                  required={true}
-                />
-              </div>
-            </div>
-            <div className="grid w-full  items-center gap-1.5">
+
+          
+          <div className="grid md:grid-cols-2 w-full items-center gap-1.5">
+            <div className="items-center gap-1.5">
               <Label htmlFor="resultionDays">Resolution Days</Label>
               <Input
                 name="resolutionDays"
@@ -351,9 +363,9 @@ export default function CreateAttestion() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 w-full  items-center gap-1.5">
+          <div className="grid md:grid-cols-2 w-full  items-center gap-1.5">
             <div className="col-span-1">
-              <Label htmlFor="picture">Mintable</Label>
+              <Label htmlFor="picture">Paid subscription</Label>
               <Select
                 defaultValue={formData.isMintable.toString()}
                 onValueChange={(e) => changeMintable(e)}
@@ -368,9 +380,8 @@ export default function CreateAttestion() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectLabel>Is it mintable</SelectLabel>
-                    <SelectItem value="true">Yes</SelectItem>
-                    <SelectItem value="false">No</SelectItem>
+                    <SelectItem value="true">Monthly Payment</SelectItem>
+                    <SelectItem value="false">Free</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -402,7 +413,8 @@ export default function CreateAttestion() {
               </div>
             )}
           </div>
-
+              
+              {/* ATTESTATION ACCESS */}
           <div className="grid grid-cols-7 w-full  items-end gap-2">
             <div className="col-span-2">
               <Label htmlFor="picture">Attest Access</Label>
@@ -429,9 +441,20 @@ export default function CreateAttestion() {
               </Select>
             </div>
             <div className="col-span-4">
-              <Label htmlFor="attestorToken">Attesters Token</Label>
+              <Label htmlFor="attestorToken">Attesters Address</Label>
               <div className="flex w-full items-center space-x-2">
-                <Input
+              {
+                formData.attesterStatus == 5 && (
+                  <Input 
+                    type="text"
+                    value={`${customAttesters.length} addresses`}
+                    disabled={true}
+                  />
+                )
+              }
+              {
+                formData.attesterStatus != 5 && (
+                  <Input
                   name="attesterToken"
                   type="text"
                   value={formData.attesterToken}
@@ -441,6 +464,9 @@ export default function CreateAttestion() {
                   required={true}
                   disabled={formData.attesterStatus < 1}
                 />
+                )
+              }
+               
               </div>
             </div>
             <div className="col-span-1">
@@ -479,10 +505,21 @@ export default function CreateAttestion() {
                   disabled={formData.attesterStatus < 1}
                 />
               )}
+               {formData.attesterStatus == 5 && (
+                  <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowAModal(!showAModal)
+                  }}
+                >
+                  <PlusIcon />
+                </Button>
+              )}
             </div>
           </div>
 
-          <div className="grid grid-cols-7 w-full  items-end gap-2">
+          <div className="grid sm:grid-cols-7 w-full items-end gap-2">
             <div className="col-span-2">
               <Label htmlFor="picture">Revoker Access</Label>
               <Select
@@ -508,9 +545,20 @@ export default function CreateAttestion() {
               </Select>
             </div>
             <div className="col-span-4">
-              <Label htmlFor="attestorToken">Revoker Token</Label>
+              <Label htmlFor="attestorToken">Revoker Address</Label>
               <div className="flex w-full items-center space-x-2">
-                <Input
+              {
+                formData.revokerStatus == 5 && (
+                  <Input 
+                    type="text"
+                    value={`${customRevokers.length} addresses`}
+                    disabled={true}
+                  />
+                )
+              }
+              {
+                formData.revokerStatus != 5 && (
+                  <Input
                   name="revokerToken"
                   type="text"
                   value={formData.revokerToken}
@@ -520,6 +568,9 @@ export default function CreateAttestion() {
                   required={true}
                   disabled={formData.revokerStatus < 1}
                 />
+                )
+              }
+               
               </div>
             </div>
             <div className="col-span-1">
@@ -558,6 +609,18 @@ export default function CreateAttestion() {
                   disabled={formData.revokerStatus < 1}
                 />
               )}
+               {formData.revokerStatus == 5 && (
+                  <Button
+                  type="submit"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowRModal(!showRModal)
+                  }}
+                >
+                  <PlusIcon />
+                </Button>
+              )}
+              
             </div>
           </div>
 
