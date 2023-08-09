@@ -48,11 +48,16 @@ export function ResolveTable<TData, TValue>({
     }
 
   })
+  
+  const showInfo = () => {
+    console.log("testing if this display anything")
+    console.log(table)
+  }
 
 
   return (
     <div>
-
+      
     <div className="rounded-md border">
       <Table>
         <TableHeader>
@@ -101,7 +106,7 @@ export function ResolveTable<TData, TValue>({
       <DataTablePagination table={table} />
     </div>
     <div className="text-right">
-      {table.getFilteredSelectedRowModel().rows.length  > 0 && <Button>Resolve ({table.getFilteredSelectedRowModel().rows.length}) issues</Button>}
+      {table.getFilteredSelectedRowModel().rows.length  > 0 && <Button onClick={showInfo}>Resolve ({table.getFilteredSelectedRowModel().rows.length}) issues</Button>}
     </div>
     </div>
   )

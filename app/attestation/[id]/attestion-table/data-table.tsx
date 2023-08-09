@@ -50,6 +50,12 @@ export function AttestionDataTable<TData, TValue>({
     }
 
   })
+  
+  const downloadFiles = async () => {
+    const files = table.getFilteredSelectedRowModel().rows.map((row) => {
+      console.log(row.original)
+    })
+  };
 
 
   return (
@@ -103,7 +109,7 @@ export function AttestionDataTable<TData, TValue>({
       <DataTablePagination table={table} />
     </div>
     <div className="text-right">
-      {table.getFilteredSelectedRowModel().rows.length  > 0 && <Button>Download ({table.getFilteredSelectedRowModel().rows.length}) files</Button>}
+      {table.getFilteredSelectedRowModel().rows.length  > 0 && <Button onClick={downloadFiles}>Download ({table.getFilteredSelectedRowModel().rows.length}) files</Button>}
     </div>
     </div>
   )

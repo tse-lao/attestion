@@ -198,7 +198,7 @@ export default function AttestationPage({
             ) : (
               <Button disabled>Private DataPool</Button>
             )}
-
+            <span>{details.attestResolutionDays}</span>
             <AccessType type="Revoke" access={hasAccess.revoke} />
             <AccessType type="Attest" access={hasAccess.attest} />
             <AccessType type="View" access={hasAccess.fileAccess} />
@@ -213,6 +213,7 @@ export default function AttestationPage({
       <AttestionDetails
         attestations={data._count?.attestations}
         id={data.id}
+        resolutionDays={details.attestResolutionDays}
         schema={data.schema}
         hasAccess={hasAccess}
         details={details}

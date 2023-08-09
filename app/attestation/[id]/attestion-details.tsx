@@ -43,12 +43,14 @@ export default function AttestionDetails({
   id,
   schema,
   hasAccess,
+  resolutionDays,
   details
 }: {
   attestations: any;
   id: string;
   schema: string;
   hasAccess: any;
+  resolutionDays: number;
   details:any;
 }) {
   const {
@@ -69,6 +71,8 @@ export default function AttestionDetails({
   });
 
   const [data, setData] = useState<Attestion[]>([]);
+  const [listAttest, setListAttest] = useState<Attestion[]>([]);
+  const [listRevoker, setListRevoker] = useState<Attestion[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -126,13 +130,22 @@ export default function AttestionDetails({
       );
 
       let attestationsList = response.data.data.getSchema.attestations;
+      
+      
+      //i want to get all the revoker that are not revoked and that are not expired
+      let revokersList = response.data.data.getSchema.attestations;
       const newTimestamp = new Date().getTime();
-      const resolutionTime = 1000 * 60 * 60 * 24 * 30;
-      for (let i = 0; i < attestationsList.length; i++) {
-        if (attestationsList.timeCreated + resolutionTime < newTimestamp) {
-          attestationsList.splice(i, 1);
-        }
-      }
+      
+      //get all attestations that are not expired
+      revokersList = revokersList.filter((attestation: { timeCreated: number; }) => 
+          attestation.timeCreated + resolutionDays >= newTimestamp
+      );
+      revokersList = revokersList.filter((attestation: { revoked: boolean; }) =>
+        attestation.revoked 
+      );
+      
+      setListRevoker(revokersList);
+      setListAttest(attestationsList);
       setData(response.data.data.getSchema.attestations);
 
       //fix schema
@@ -147,7 +160,7 @@ export default function AttestionDetails({
       }
       getData();
     }
-  }, [attestations, id]);
+  }, [attestations, id, resolutionDays]);
 
   if(loading) return <Loading />;
   return (
@@ -173,7 +186,7 @@ export default function AttestionDetails({
         </Card>
       </TabsContent>
       <TabsContent value="view" className="w-full">
-        {hasAccess.attest ? <AttestionData id={id} attestations={data}/> : <div> No access </div>}
+        {hasAccess.attest ? <AttestionData id={id} attestations={listAttest}/> : <div> No access </div>}
       </TabsContent>
       <TabsContent value="revoke" className="w-full">
         {hasAccess.revoke ? (

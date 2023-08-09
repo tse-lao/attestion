@@ -37,7 +37,7 @@ export default function CreateAttestion() {
     description: "lorem ipsum health care data is important to track since it provides a global benefit of many things",
     categories: "'health', 'care'", // comma separated list of categories
     attestRevokePeriod: "100",
-    resolutionDays: "100",
+    resolutionDays: 100,
     mintPrice: 0,
     schemaInput: {
       name: "",
@@ -166,12 +166,13 @@ export default function CreateAttestion() {
       })
     }
     
-    
+    //convert to days.. 
+    const days = formData.resolutionDays * 86400;
     let params = [
       formData.name,
       formData.description,
       ["test data", "no meaning"],
-      formData.resolutionDays,
+      days,
       formData.schema,
       formData.mintPrice,
       formData.attestReward,
