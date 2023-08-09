@@ -1,6 +1,5 @@
 "use client"
 
-import { Badge } from "@/components/ui/badge"
 import { ColumnDef } from "@tanstack/react-table"
 
 // This type is used to define the shape of our data.
@@ -16,25 +15,31 @@ export type Attestion = {
 
 export const AttestionColumns: ColumnDef<any>[] = [
   {
-    accessorKey: "Attester",
+    accessorKey: "attester",
     header: "attestest",
   },
   {
-    accessorKey: "Data",
-    header: "Data",
-  },
-  {
-    accessorKey: "time",
-    header: "Status",
-  },
-  {
-    accessorKey: "tags",
-    header: "Tags",
+    accessorKey: "decodedDataJson",
+    header: "Name",
     cell: ({ row }) => {
-      const tags = row.getValue("tags") as string;
-      const tagArray = tags.split(",") as [];
-      return tagArray.map((tag, i) => <Badge key={i} className="mx-1">{tag}</Badge>);
-
+      const data = row.getValue("attester") as string;
+      return data;
+    }
+  },
+  {
+    accessorKey: "decodedDataJson",
+    header: "Description",
+    cell: ({ row }) => {
+      const data = row.getValue("timeCreated") as string;
+      return data;
+    }
+  },
+  {
+    accessorKey: "decodedDataJson",
+    header: "Cid",
+    cell: ({ row }) => {
+      const data = row.getValue("timeCreated") as string;
+      return data;
     }
   },
 

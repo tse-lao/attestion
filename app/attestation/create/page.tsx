@@ -1,5 +1,6 @@
 "use client";
 import CustomAddress from "@/components/core/attestation/customAddress";
+import SchemaList from "@/components/core/attestation/schema/schema-list";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -314,7 +315,7 @@ export default function CreateAttestion() {
       {showAModal && <CustomAddress addresses={customAttesters} addAddress={addAttestAddress} showModal={showAModal} setShowModal={setShowAModal} />}
       <div className=" p-8 m-12 rounded-md flex flex-col justify-center items-center">
         <h1 className="text-center text-2xl mb-4 text-green-300">
-          Create Optimistic Attestation
+          Create Data Vault
         </h1>
         <div className="flex flex-col gap-8 bg-gray-600 rounded-md p-12 w-full max-w-2xl">
           <div className="items-center gap-1.5">
@@ -402,7 +403,9 @@ export default function CreateAttestion() {
               <PlusIcon className="h-5 w-5" />
             </Button>
           </div>
-
+          <div className="grid grid-cols-4">
+            <SchemaList list={formData.schema} />
+          </div>
           
           <div className="grid md:grid-cols-2 w-full items-center gap-1.5">
             <div className="items-center gap-1.5">
@@ -444,7 +447,7 @@ export default function CreateAttestion() {
 
             {formData.isMintable ? (
               <div>
-                <Label htmlFor="mintPrice">Mint price</Label>
+                <Label htmlFor="mintPrice">Subscription price</Label>
                 <Input
                   name="mintPrice"
                   type="number"
@@ -472,7 +475,7 @@ export default function CreateAttestion() {
               {/* ATTESTATION ACCESS */}
           <div className="grid grid-cols-7 w-full  items-end gap-2">
             <div className="col-span-2">
-              <Label htmlFor="picture">Attest Access</Label>
+              <Label htmlFor="picture">Access Providers</Label>
               <Select
                 defaultValue={formData.attesterStatus.toString()}
                 onValueChange={(e) => changeSelect(e, "attesterStatus")}
@@ -488,7 +491,7 @@ export default function CreateAttestion() {
                   <SelectGroup className="text-sm">
                     <SelectItem value="0">Anyone</SelectItem>
                     <SelectItem value="4">Token</SelectItem>
-                    <SelectItem value="6">WLD Holders</SelectItem>
+                    <SelectItem value="6">Verified Humans</SelectItem>
                     <SelectItem value="7" disabled>Sismo Proof</SelectItem>
                     <SelectItem value="5">Custom</SelectItem>
                   </SelectGroup>
@@ -576,7 +579,7 @@ export default function CreateAttestion() {
 
           <div className="grid sm:grid-cols-7 w-full items-end gap-2">
             <div className="col-span-2">
-              <Label htmlFor="picture">Revoker Access</Label>
+              <Label htmlFor="picture">Verifiers Access</Label>
               <Select
                 defaultValue={formData.revokerStatus.toString()}
                 onValueChange={(e) => changeSelect(e, "revokerStatus")}
@@ -592,7 +595,7 @@ export default function CreateAttestion() {
                   <SelectGroup className="text-sm">
                     <SelectItem value="0">Anyone</SelectItem>
                     <SelectItem value="4">Token</SelectItem>
-                    <SelectItem value="6">WLD Holders</SelectItem>
+                    <SelectItem value="6">Verified Humans</SelectItem>
                     <SelectItem value="7" disabled>Sismo Proof</SelectItem>
                     <SelectItem value="5">Custom</SelectItem>
                   </SelectGroup>
@@ -600,7 +603,7 @@ export default function CreateAttestion() {
               </Select>
             </div>
             <div className="col-span-4">
-              <Label htmlFor="attestorToken">Revoker Address</Label>
+              <Label htmlFor="attestorToken">Data Verifiers Address</Label>
               <div className="flex w-full items-center space-x-2">
               {
                 formData.revokerStatus == 5 && (
@@ -685,7 +688,7 @@ export default function CreateAttestion() {
                 className="w-full bg-green-300 text-gray-900 hover:text-green-300"
                 onClick={handleSubmit}
               >
-                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                <ReloadIcon className="mr-2 h-4 w-4 animate-spin" /> Loading...
               </Button>
             ) : (
               <Button
@@ -693,7 +696,7 @@ export default function CreateAttestion() {
                 onClick={handleSubmit}
               >
                 <PlusIcon className="mr-2 h-4 w-4" />{" "}
-                <span> Create Attestion</span>
+                <span> Create Data Vault</span>
               </Button>
             )}
           </div>

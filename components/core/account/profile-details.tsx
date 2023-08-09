@@ -48,7 +48,7 @@ export default function ProfileDetails({ showModal, open, setShowModal }: any) {
                 if(i == 0){
                     setBalances([{chain: chains[i], balance: getBalance, active: chain?.id == chains[i].id}])
                 }else {
-                    setBalances((prev: any) => [...prev, {chain: chains[i], balance: formatEther(getBalance), active: chain?.id == chains[i].id}])
+                    setBalances((prev: any) => [...prev, {chain: chains[i], balance: getBalance, active: chain?.id == chains[i].id}])
                 }
             }
 

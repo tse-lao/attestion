@@ -43,7 +43,7 @@ export default function Navbar({ links }: { links: any }) {
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:items-center">
                 <Link className="bg-green-300 font-semibold text-sm rounded-md px-3 py-2 text-gray-800 hover:bg-green-200 inline-flex items-center" href="/attestation/create">
-                    Create Attestation
+                    Create Data Vault
                   </Link>
 
                 {/* Profile dropdown */}

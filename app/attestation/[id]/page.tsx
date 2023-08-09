@@ -22,9 +22,9 @@ export default function AttestationPage({
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [hasAccess, setHasAccess] = useState<any>({
-    revoke: true, 
-    attest: true, 
-    fileAccess: true
+    revoke: false, 
+    attest: false, 
+    fileAccess: false
   });
   const {address} = useAccount();
   const {
@@ -129,7 +129,7 @@ export default function AttestationPage({
         args: [schemaUID, address],
       }) as boolean
       
-      console.log(fileAccess)
+
       const revokeAccess = await readContract({
         address: CONTRACTS.attestionFactory[420].contract,
         abi: CONTRACTS.attestionFactory[420].abi,
@@ -139,21 +139,21 @@ export default function AttestationPage({
       
       
       
-      /* const attestAccess = await readContract({
-        address: CONTRACTS.attestionFactory.optimistic.contract,
-        abi: CONTRACTS.attestionFactory.optimistic.abi,
+       const attestAccess = await readContract({
+        address: CONTRACTS.attestionFactory[420].contract,
+        abi: CONTRACTS.attestionFactory[420].abi,
         functionName: 'hasAttestAccess',
-        args: [params.id, address],
+        args: [schemaUID, address],
       }) as boolean
-       */
-
+       
+ 
       setHasAccess({
         revoke: revokeAccess,
-        attest: true,
+        attest: attestAccess,
         fileAccess: fileAccess
       })
         
-      console.log(revokeAccess, true, fileAccess)
+      console.log(revokeAccess, attestAccess, fileAccess)
     }
 
     if (params.id, address) {
@@ -182,9 +182,9 @@ export default function AttestationPage({
         </div>
       </div>
       <div className="flex gap-4">
-        <AccessType type="Revoke Access" access={false} />
-        <AccessType type="Attest Access" access={true} />
-        <AccessType type="View Access" access={false} />
+        <AccessType type="Revoke Access" access={hasAccess.revoke} />
+        <AccessType type="Attest Access" access={hasAccess.attest} />
+        <AccessType type="View Access" access={hasAccess.fileAccess} />
       </div>
 
       <div>
@@ -207,7 +207,7 @@ export default function AttestationPage({
            id={data.id}
            schema={data.schema}
            hasAccess={hasAccess}
-            details={details} 
+          details={details} 
          />
 
      

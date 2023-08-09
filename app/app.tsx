@@ -81,7 +81,7 @@ let links = [
   },
   {
     href: "/attestation",
-    name: "Attestation",
+    name: "Data Vaults",
   },
 ];
 

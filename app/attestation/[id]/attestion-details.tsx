@@ -153,9 +153,9 @@ export default function AttestionDetails({
   return (
     <Tabs defaultValue="attest" className="w-full flex flex-col items-center">
       <TabsList className="grid max-w-2xl grid-cols-3 mb-4">
-        <TabsTrigger value="attest">Attest</TabsTrigger>
-        <TabsTrigger value="view">View Attestations</TabsTrigger>
-        <TabsTrigger value="revoke">Revoke</TabsTrigger>
+        <TabsTrigger value="attest" disabled={!hasAccess.attest}>Attest</TabsTrigger>
+        <TabsTrigger value="view" disabled={!hasAccess.fileAccess}>View Attestations</TabsTrigger>
+        <TabsTrigger value="revoke" disabled={!hasAccess.revoke}>Revoke</TabsTrigger>
       </TabsList>
       <TabsContent value="attest" className="min-w-[300px]">
         <Card>
@@ -173,7 +173,7 @@ export default function AttestionDetails({
         </Card>
       </TabsContent>
       <TabsContent value="view" className="w-full">
-        {hasAccess.attest ? <AttestionData /> : <div>No access </div>}
+        {hasAccess.attest ? <AttestionData id={id} attestations={attestations}/> : <div>No access </div>}
       </TabsContent>
       <TabsContent value="revoke" className="w-full">
         {hasAccess.revoke ? (

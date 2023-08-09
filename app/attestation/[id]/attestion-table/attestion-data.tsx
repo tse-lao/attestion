@@ -1,69 +1,101 @@
 "use client";
+import Loading from "@/components/core/loading/loading";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Attestion, AttestionColumns } from "./columns";
 import { AttestionDataTable } from "./data-table";
 
 
-export default function AttestionData() {
+export default function AttestionData({id, attestations}: {id: string, attestations: number}) {
   const [data, setData] = useState<Attestion[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function getData() {
-      // Fetch data from your API here.
-      setData([
-        {
-          "id": "1",
-          "name": "John Doe",
-          "tags": "tag1, tag2, tag3",
-          "file": "file001",
-          "status": "attested",
-          "email": "johndoe@example.com"
-        },
-        {
-          "id": "2",
-          "name": "Jane Smith",
-          "tags": "tag4, tag5, tag6",
-          "file": "file002",
-          "status": "revoked",
-          "email": "janesmith@example.com"
-        },
-        {
-          "id": "3",
-          "name": "Bob Johnson",
-          "tags": "tag7, tag8, tag9",
-          "file": "file003",
-          "status": "finished",
-          "email": "bobjohnson@example.com"
-        },
-        {
-          "id": "4",
-          "name": "Alice Williams",
-          "tags": "tag10, tag11, tag12",
-          "file": "file004",
-          "status": "attested",
-          "email": "alicewilliams@example.com"
-        },
-        {
-          "id": "5",
-          "name": "Charlie Brown",
-          "tags": "tag13, tag14, tag15",
-          "file": "file005",
-          "status": "revoked",
-          "email": "charliebrown@example.com"
+      const getData = async () => {
+        const baseURL = `https://optimism-goerli.easscan.org/graphql`;
+        const response = await axios.post<any>(
+          `${baseURL}/graphql`,
+          {
+            query:
+              `query FindFirstSchema($where: SchemaWhereUniqueInput!) {
+                getSchema(where: $where) {
+                  _count {
+                    attestations
+                  }
+                  creator
+                  id
+                  index
+                  resolver
+                  revocable
+                  schema
+                  txid
+                  time
+                  attestations {
+                    attester
+                    data
+                    decodedDataJson
+                    expirationTime
+                    ipfsHash
+                    id
+                    isOffchain
+                    recipient
+                    refUID
+                    revocable
+                    revocationTime
+                    revoked
+                    schemaId
+                    time
+                    timeCreated
+                    txid
+                  }
+                }
+              }`,
+            variables: {
+              where: {
+                id: id,
+              },
+            },
+          },
+          {
+            headers: {
+              "content-type": "application/json",
+            },
+          }
+        );
+       
+        
+
+        let attestationsList =  response.data.data.getSchema.attestations;
+        const newTimestamp = new Date().getTime();
+        const resolutionTime = 1000 * 60 * 60 * 24 * 30;
+        for(let i = 0; i < attestationsList.length; i++){
+          if(attestationsList.timeCreated + resolutionTime < newTimestamp){
+            attestationsList.splice(i, 1)
+          }
+        
         }
-      ]
-      );
+        setData(response.data.data.getSchema.attestations)
+        
+        //fix schema 
+        console.log(response.data.data.getSchema)
+        setLoading(false)
       
-      setLoading(false);
+    }
+    
+    if(id){
+      if(attestations < 1){
+        setLoading(false)
+        return;
+      }
+      getData()
     }
 
-    getData();
-  }, []);
+
+  }, [attestations, id]);
 
   return (
     <div className="container mx-auto py-10">
-      {loading ? <div>Loading...</div> :       <AttestionDataTable columns={AttestionColumns} data={data} />
+      {loading ? <Loading /> :       <AttestionDataTable columns={AttestionColumns} data={data} />
 }
     </div>
   );
