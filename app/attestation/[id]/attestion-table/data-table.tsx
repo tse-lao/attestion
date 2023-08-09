@@ -4,9 +4,16 @@ import {
   ColumnDef,
   flexRender,
   getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
   useReactTable,
 } from "@tanstack/react-table"
 
+
+
+import { Button } from "@/components/ui/button"
+import { DataTablePagination } from "@/components/ui/data-table-pagination"
 import {
   Table,
   TableBody,
@@ -15,6 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useState } from "react"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -25,15 +33,28 @@ export function AttestionDataTable<TData, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [rowSelection, setRowSelection] = useState({})
+
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    onSortingChange: setSorting,
+    getSortedRowModel: getSortedRowModel(),
+    onRowSelectionChange: setRowSelection,
+    state: {
+      sorting,
+      rowSelection,
+    }
+
   })
-  
-  
+
 
   return (
+    <div>
+
     <div className="rounded-md border">
       <Table>
         <TableHeader>
@@ -77,6 +98,13 @@ export function AttestionDataTable<TData, TValue>({
           )}
         </TableBody>
       </Table>
+    </div>
+    <div className="flex items-center justify-end space-x-2 py-4">
+      <DataTablePagination table={table} />
+    </div>
+    <div className="text-right">
+      {table.getFilteredSelectedRowModel().rows.length  > 0 && <Button>Download ({table.getFilteredSelectedRowModel().rows.length}) files</Button>}
+    </div>
     </div>
   )
 }

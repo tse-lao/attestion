@@ -2,13 +2,14 @@ import { CheckIcon, XIcon } from "lucide-react"
 
 export default function AccessType({type, access}: {type: string, access: boolean}) {
   return (
-    <div className="rounded-md flex justify-between border border-gray-900 ">
-        <span className="p-2 text-gray-300 uppercase text-sm pr-8">
-            {type}
-        </span>
-        <div className="bg-gray-500 rounded-lg border-l border-gray-900 flex items-center px-4">
+    <div className="rounded-md flex gap-2 px-2 py-1 border border-gray-900 bg-gray-900/2">
+      <div className="flex items-center">
             {access ? <CheckIcon className="text-green-300" /> : <XIcon className="text-red-300" />}
         </div>
+        <span className="px-1 text-gray-300 capitalise text-sm">
+            {type}
+        </span>
+        
     </div>
   )
 }

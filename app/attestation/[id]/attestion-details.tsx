@@ -47,7 +47,7 @@ export default function AttestionDetails({
 }: {
   attestations: any;
   id: string;
-  schema: any;
+  schema: string;
   hasAccess: any;
   details:any;
 }) {
@@ -168,12 +168,12 @@ export default function AttestionDetails({
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <SchemaForm list={schema} schemaUID={id} />
+            <SchemaForm schema={schema} schemaUID={id} />
           </CardContent>
         </Card>
       </TabsContent>
       <TabsContent value="view" className="w-full">
-        {hasAccess.attest ? <AttestionData id={id} attestations={attestations}/> : <div>No access </div>}
+        {hasAccess.attest ? <AttestionData id={id} attestations={data}/> : <div> No access </div>}
       </TabsContent>
       <TabsContent value="revoke" className="w-full">
         {hasAccess.revoke ? (

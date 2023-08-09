@@ -1,14 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useEthersSigner } from "@/lib/ethers";
 import { getLighthouseKeys } from "@/lib/lighthouse";
 
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
-import { Label } from "@radix-ui/react-label";
+import { ReloadIcon } from "@radix-ui/react-icons";
+
 import axios from "axios";
-import { List } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
@@ -19,13 +20,14 @@ export type SchemaInput = {
   type: string;
 };
 export default function SchemaForm({
-  list,
+  schema,
   schemaUID,
 }: {
-  list: string;
+  schema: string;
   schemaUID: string;
 }) {
-  const [schema, setSchema] = useState<SchemaInput[]>([]);
+//  const [schema, setSchema] = useState<SchemaInput[]>([]);
+  const [loading, setLoading] = useState<boolean>(false);
   const [formData, setFormData] = useState<any>({
     name: "Test Attestation", 
     file: "QmUCfJPFi5oCGruzVQQyt9zB2bjBkfckjB53LNJ5Qpzv5b", 
@@ -113,29 +115,30 @@ export default function SchemaForm({
   };
 
   const submitData = async () => {
-
+    setLoading(true);
     const EASoGoerli = "0x1a5650d0ecbca349dd84bafa85790e3e6955eb84";
     const eas = new EAS(EASoGoerli);
+
     //const signer = walletClientToSigner(walletCline);
 
       //@ts-ignore
       eas.connect(signer);
 
     //ts-ignore error
-    console.log(List)
     const schemaEncoder = new SchemaEncoder("string name, string file, string description");
     //check if there is a type of uint256 and convert value to number
-    console.log(schema);
     
-    // its not a schema so we can put in our won. 
-    const encodedData = schemaEncoder.encodeData([
+    
+    const schemaList = [
       { name: "name", value: formData.name, type: "string" },
       { name: "file", value: formData.file, type: "string" },
       { name: "description", value: formData.description, type: "string" },
-    ]);
+    ]
+    // its not a schema so we can put in our won. 
+    console.log(schemaList);
+    const encodedData = schemaEncoder.encodeData(schemaList);
     
-    console.log(schemaUID)
-
+    
     const tx = await eas.attest({
       schema: schemaUID,
       data: {
@@ -147,11 +150,14 @@ export default function SchemaForm({
 
     const newAttestationUID = await tx.wait();
 
-    console.log("New attestation UID:", newAttestationUID);
+    toast.success("New attestation has been made");
+    console.log(newAttestationUID)
+    setLoading(false);
   };
 
   return (
     <div className="w-full flex flex-col gap-4">
+      
       <div>
               <Label>Name</Label>
               <Input
@@ -174,7 +180,7 @@ export default function SchemaForm({
               onChange={(e) => handleFileChange(e)}
               className="rounded bg-none  text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-            {formData.file && <span>{formData.file}</span>}
+            {formData.file && <span className="text-gray-300 text-xs mt-2 ">Succesfully uploaded: {formData.file}</span>}
 
             </div>
             <div>
@@ -182,13 +188,19 @@ export default function SchemaForm({
               <Textarea
                 name="description"
                 rows={3}
+                className="bg-gray-300 text-gray-900"
                 value={formData.description}
                 onChange={handleChange}
                 placeholder="Name"
 
               />
             </div>
-      <Button onClick={submitData}>Submit data</Button>
+            {loading ? 
+             <Button disabled>
+              <ReloadIcon className="w-5 h-5 mr-2 animate-spin" /> Attesting...
+             </Button> :  <Button onClick={submitData}>Submit data</Button>
+            }
+     
     </div>
   );
 }
