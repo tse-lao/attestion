@@ -44,7 +44,7 @@ export default function CreateAttestion() {
       type: "string",
       isArray: "false",
     } as SchemaInput,
-    schema: "name string, file string, description string",
+    schema: "string name, string file, string description",
     attesterToken: "0x0000000000000000000000000000000000000000",
     attesterTokenID: 0,
     attesterStatus: 0,
