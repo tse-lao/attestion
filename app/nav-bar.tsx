@@ -31,7 +31,7 @@ export default function Navbar({ links }: { links: any }) {
                       key={index}
                       href={link.href}
                       className={`inline-flex items-center border-b-2 
-                      ${pathname == link.href ? 'border-indigo-500':'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-400'}  
+                      ${pathname == link.href ? 'border-green-300':'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-400'}  
                       px-1 pt-1 text-md font-medium text-gray-300`}
                     >
                       {link.name}
@@ -54,7 +54,7 @@ export default function Navbar({ links }: { links: any }) {
               <div className="-mr-2 flex items-center sm:hidden">
                 {/* Mobile menu button */}
                 <Disclosure.Button className="inline-flex items-center justify-center rounded-md p-2
-                 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">
+                 text-gray-400 hover:bg-gray-100 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-green-300">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <XMarkIcon className="block h-6 w-6" aria-hidden="true" />
@@ -68,14 +68,14 @@ export default function Navbar({ links }: { links: any }) {
 
           <Disclosure.Panel className="sm:hidden">
             <div className="space-y-1 pb-3 pt-2">
-              {/* Current: "bg-indigo-50 border-indigo-500 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" */}
+              {/* Current: "bg-indigo-50 border-green-300 text-indigo-700", Default: "border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700" */}
               {links.map((link: any, index: number) => (
                 <Disclosure.Button
                 key={index}
                 as="a"
                 href={link.href}
                 className={`block border-l-4  bg-indigo-50 py-2 pl-3 pr-4 text-base font-medium 
-                ${pathname == link.href ? 'border-indigo-500 text-indigo-700': 'border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700'}  
+                ${pathname.includes(link.href) ? 'border-green-300 text-green-700': 'border-transparent text-gray-500 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700'}  
                 `}
               >
                 {link.name}

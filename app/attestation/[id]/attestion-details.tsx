@@ -55,16 +55,16 @@ export default function AttestionDetails({
     isLoading: resolveLoading,
     write: resolve,
   } = useContractWrite({
-    address: CONTRACTS.attestation.optimistic.contract,
-    abi: CONTRACTS.attestation.optimistic.abi,
+    address: CONTRACTS.attestation[420].contract,
+    abi: CONTRACTS.attestation[420].abi,
     functionName: "resolveAttestations",
   });
   const {
     isLoading: splitLoading,
     write: splitFunds,
   } = useContractWrite({
-    address: CONTRACTS.attestation.optimistic.contract,
-    abi: CONTRACTS.attestation.optimistic.abi,
+    address: CONTRACTS.attestation[420].contract,
+    abi: CONTRACTS.attestation[420].abi,
     functionName: "splitMintingFunds",
   });
 
@@ -73,6 +73,8 @@ export default function AttestionDetails({
 
   useEffect(() => {
     const getData = async () => {
+      
+      
       const baseURL = `https://optimism-goerli.easscan.org/graphql`;
       const response = await axios.post<any>(
         `${baseURL}/graphql`,

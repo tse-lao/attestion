@@ -32,11 +32,10 @@ export type SchemaInput = {
 };
 export default function CreateAttestion() {
   const [formData, setFormData] = useState({
-    name: "DataPonte First Survey",
-    description: "Lets try to see if we can make this work",
-    attestRevokeBond: "1000000000000000000",
+    name: "HealthCare Data",
+    description: "lorem ipsum health care data is important to track since it provides a global benefit of many things",
+    categories: "'health', 'care'", // comma separated list of categories
     attestRevokePeriod: "100",
-    attestRevokePenalty: "1000000000000000000",
     resolutionDays: "100",
     mintPrice: 0,
     schemaInput: {
@@ -54,6 +53,7 @@ export default function CreateAttestion() {
     revokerTokenID: 0,
     revokerStatus: 0,
   });
+
   
   const [customRevokers, setCustomRevokers] = useState<string[]>([]);
   const [customAttesters, setCustomAttesters] = useState<string[]>([]);
@@ -62,10 +62,18 @@ export default function CreateAttestion() {
   const publicClient = usePublicClient();
 
   const { data, isLoading, isSuccess, write } = useContractWrite({
-    address: CONTRACTS.attestionFactory.optimistic.contract,
-    abi: CONTRACTS.attestionFactory.optimistic.abi,
+    address: CONTRACTS.attestionFactory[420].contract,
+    abi: CONTRACTS.attestionFactory[420].abi,
     functionName: "createSuperSchema",
   });
+  
+  const { data:customData, isSuccess:customSuccess, write:customCreate} = useContractWrite({
+    address: CONTRACTS.tokenCreator[420].contract,
+    abi: CONTRACTS.tokenCreator[420].abi,
+    functionName: "createAccessControlContract",
+  });
+  
+  
 
   
   const addSchemaInput = () => {
@@ -145,22 +153,40 @@ export default function CreateAttestion() {
     console.log(formData);
 
     //[attestionDays, schema, mintPrice, attestReward, mitnable]
+    
+    if(formData.attesterStatus == 5 || formData.revokerStatus == 5){
+      //we want to create here the customAddress
+      
+      const attesters = formData.attesterStatus == 5 ? customAttesters : []
+      const revokers = formData.revokerStatus == 5 ? customRevokers : []
+
+      customCreate({
+        args: [attesters, revokers]
+      })
+    }
+    
+    
     let params = [
       formData.name,
       formData.description,
+      ["test data", "no meaning"],
       formData.resolutionDays,
       formData.schema,
       formData.mintPrice,
       formData.attestReward,
       formData.isMintable,
     ];
+    
     const tokenGateAddresses = [formData.attesterToken, formData.revokerToken];
-
-    const tokenGateEnum = [formData.attesterStatus, formData.revokerStatus];
-    const tokenGateTokenID = [
-      formData.attesterTokenID,
-      formData.revokerTokenID,
-    ];
+    
+    let tokenGateEnumA = formData.attesterStatus;
+    let tokenGateEnumR = formData.revokerStatus;
+    if(formData.attesterStatus == 5){ tokenGateEnumA = 1}
+    if(formData.revokerStatus == 5){ tokenGateEnumR = 1}
+    
+    const tokenGateEnum = [tokenGateEnumA, tokenGateEnumR];
+    const tokenGateTokenID = [formData.attesterTokenID,formData.revokerTokenID];
+    
     write({
       args: [tokenGateAddresses, tokenGateEnum, tokenGateTokenID, params],
     });
@@ -191,6 +217,15 @@ export default function CreateAttestion() {
 
   const changeSelect = (e: any, type: string) => {
     if (type == "attesterStatus") {
+      if(e === "6"){
+        setFormData({
+          ...formData,
+          attesterStatus: e,
+          attesterTokenID: 0,
+          attesterToken: CONTRACTS.worldcoin[420].contract,
+        });
+        return;
+      }
       setFormData({
         ...formData,
         attesterStatus: e,
@@ -200,6 +235,15 @@ export default function CreateAttestion() {
       return;
     }
     if (type == "revokerStatus") {
+      if(e === "6"){
+        setFormData({
+          ...formData,
+          revokerStatus: e,
+          revokerTokenID: 0,
+          revokerToken: CONTRACTS.worldcoin[420].contract,
+        });
+        return
+      }
       setFormData({
         ...formData,
         revokerStatus: e,
@@ -291,6 +335,17 @@ export default function CreateAttestion() {
               value={formData.description}
               onChange={handleChange}
               placeholder="Description"
+              required={true}
+            />
+          </div>
+          <div className="items-center gap-1.5">
+            <Label htmlFor="picture">Categories</Label>
+            <Input
+              name="categories"
+              type="text"
+              value={formData.categories}
+              onChange={handleChange}
+              placeholder="Seperate with , "
               required={true}
             />
           </div>

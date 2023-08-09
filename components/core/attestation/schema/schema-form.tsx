@@ -8,6 +8,7 @@ import { getLighthouseKeys } from "@/lib/lighthouse";
 import { EAS, SchemaEncoder } from "@ethereum-attestation-service/eas-sdk";
 import { Label } from "@radix-ui/react-label";
 import axios from "axios";
+import { List } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import { useAccount } from "wagmi";
@@ -26,9 +27,9 @@ export default function SchemaForm({
 }) {
   const [schema, setSchema] = useState<SchemaInput[]>([]);
   const [formData, setFormData] = useState<any>({
-    name: "", 
-    file: "", 
-    description: "",
+    name: "Test Attestation", 
+    file: "QmUCfJPFi5oCGruzVQQyt9zB2bjBkfckjB53LNJ5Qpzv5b", 
+    description: "This is incorrect and needs to be revoked if posisble",
     
   });
   const signer = useEthersSigner();
@@ -58,14 +59,15 @@ export default function SchemaForm({
   }, [list]);
  */
   const handleChange = (e: any) => {
-    const { name, value } = e.target;
-    setSchema((prev: any) =>
-      prev.map((item: any) => (item.name === name ? { ...item, value } : item))
-    );
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleFileChange = async(e: any) => {
     //need to upload file to lighthouse and make sure that we get back the hash.
+    console.log(e)
     if (!address) {
       toast.error("no valid address");
 
@@ -92,15 +94,17 @@ export default function SchemaForm({
     };
 
     try {
-      const url = process.env.NEXT_PUBLIC_API || "https://api.dataponte.com";
+      const url = "https://api.dataponte.com";
       const response = await axios.post(
         `${url}/files/uploadFile`,
         formData,
         config
       );
       
+      console.log(response)
       toast.success("File uploaded successfully");
-      const hash = response.data.Hash;
+      const hash = response.data.data[0].Hash;
+      console.log(hash)
       setFormData((prev: any) => ({ ...prev, file: hash }));
     } catch (err) {
       toast.error("Something went wrong when uploading the file");
@@ -109,26 +113,33 @@ export default function SchemaForm({
   };
 
   const submitData = async () => {
-    console.log(schema);
+
     const EASoGoerli = "0x1a5650d0ecbca349dd84bafa85790e3e6955eb84";
     const eas = new EAS(EASoGoerli);
     //const signer = walletClientToSigner(walletCline);
-    if (!signer) {
+
       //@ts-ignore
       eas.connect(signer);
-    }
-    //ts-ignore error
 
-    const schemaEncoder = new SchemaEncoder(list);
+    //ts-ignore error
+    console.log(List)
+    const schemaEncoder = new SchemaEncoder("string name, string file, string description");
     //check if there is a type of uint256 and convert value to number
     console.log(schema);
-    const encodedData = schemaEncoder.encodeData(schema);
+    
+    // its not a schema so we can put in our won. 
+    const encodedData = schemaEncoder.encodeData([
+      { name: "name", value: formData.name, type: "string" },
+      { name: "file", value: formData.file, type: "string" },
+      { name: "description", value: formData.description, type: "string" },
+    ]);
+    
+    console.log(schemaUID)
 
     const tx = await eas.attest({
       schema: schemaUID,
       data: {
         recipient: "0x0000000000000000000000000000000000000000",
-
         revocable: true,
         data: encodedData,
       },
@@ -155,18 +166,21 @@ export default function SchemaForm({
             <div>
               <Label>Upload Data</Label>
               <Input
-              name="name"
               type="file"
-              value={formData.name}
-              onChange={handleFileChange}
-              placeholder="Name"
-              required={true}
+              id="image"
+              name="image"
+              multiple
+              accept="*"
+              onChange={(e) => handleFileChange(e)}
+              className="rounded bg-none  text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
+            {formData.file && <span>{formData.file}</span>}
+
             </div>
             <div>
               <Label>Description</Label>
               <Textarea
-                name="name"
+                name="description"
                 rows={3}
                 value={formData.description}
                 onChange={handleChange}

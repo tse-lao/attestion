@@ -31,8 +31,8 @@ export default function AttestationPage({
   isLoading: minting,
   write: mint,
 } = useContractWrite({
-  address: CONTRACTS.attestionFactory.optimistic.contract,
-  abi: CONTRACTS.attestionFactory.optimistic.abi,
+  address: CONTRACTS.attestionFactory[420].contract,
+  abi: CONTRACTS.attestionFactory[420].abi,
   functionName: "mint",
   args: [details.mintPrice, details.schemaUID],
   
@@ -123,16 +123,16 @@ export default function AttestationPage({
     
     const getAccess = async (schemaUID:string) => {
       const fileAccess = await readContract({
-        address: CONTRACTS.attestionFactory.optimistic.contract,
-        abi: CONTRACTS.attestionFactory.optimistic.abi,
+        address: CONTRACTS.attestionFactory[420].contract,
+        abi: CONTRACTS.attestionFactory[420].abi,
         functionName: 'hasAccess',
         args: [schemaUID, address],
       }) as boolean
       
       console.log(fileAccess)
       const revokeAccess = await readContract({
-        address: CONTRACTS.attestionFactory.optimistic.contract,
-        abi: CONTRACTS.attestionFactory.optimistic.abi,
+        address: CONTRACTS.attestionFactory[420].contract,
+        abi: CONTRACTS.attestionFactory[420].abi,
         functionName: 'hasRevokeAccess',
         args: [schemaUID, address],
       }) as boolean

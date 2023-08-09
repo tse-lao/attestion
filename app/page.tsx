@@ -2,6 +2,7 @@
 
 
 import LoginButton from "@/components/core/account/login-button"
+import Worldcoin from "@/components/core/worldcoin/worldcoin"
 import { CONTRACTS } from "@/constants/contracts"
 import Link from "next/link"
 import { useAccount } from "wagmi"
@@ -17,12 +18,13 @@ export default function Home() {
             <h1>Welcome you are logged in! Please feel free to look and play arround</h1>
             
             <div>
+              <h3>WorldCoin</h3>
+              <Worldcoin />
+            </div>
+            <div>
               <h3>Contracts</h3>
               <span className="grid">
-                <Link className="text-green-300" 
-                href={`https://goerli-optimism.etherscan.io/address/${CONTRACTS.attestionFactory.optimistic.contract}#code`} target="_blank">Optimistic Goerli attestationFactory Contract</Link>
-                <Link className="text-green-300" 
-                href={`https://goerli-optimism.etherscan.io/address/${CONTRACTS.attestation.optimistic.contract}#code`} target="_blank">Optimistic Goerli Attestation </Link>
+                <DisplayLinks />
               </span>
             </div>
           </div>
@@ -34,3 +36,29 @@ export default function Home() {
     </main>
   )
 }
+
+
+function DisplayLinks () {
+  return (
+    <div>
+      {Object.entries(CONTRACTS).map(([contractName, networks]) => (
+        <div key={contractName} className="flex flex-col gap-2">
+          <h2 className="mt-4 text-2xl ">{contractName}</h2>
+          {Object.entries(networks).map(([networkId, details]) => (
+            <div key={networkId}>
+              {networkId === "420" ? (
+                <Link href={`https://goerli-optimism.etherscan.io/address/${details.contract}`} target="_blank" className="text-red-300">
+                  {details.contract}
+                </Link>
+              ) : (
+                <Link href={` https://basescan.org/address/${details.contract}`} target="_blank" className="text-blue-300">
+                  {details.contract}
+                </Link>
+              )}
+            </div>
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+};

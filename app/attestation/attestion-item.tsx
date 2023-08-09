@@ -7,7 +7,6 @@ import {
   CheckIcon,
   CoinsIcon,
   GemIcon,
-  MoreVerticalIcon,
   TimerIcon
 } from "lucide-react";
 import Link from "next/link";
@@ -77,7 +76,6 @@ export default function AttestionItem({ schema}: {schema: any}) {
       <Link className="bg-gray-600 rounded-md p-4 flex flex-col gap-4 hover:outline hover:outline-green-300"  href={`/attestation/${schema.id}`}>
       <div className="flex justify-between pt-4 px-4">
           <div className="text-xl text-white hover:text-green-300" >{schema.name}</div>
-          <MoreVerticalIcon className="text-gray-400 hover:text-gray-50 z-10 cursor-pointer" />
       </div>
       <div>
       <span className="text-gray-200 italic font-light text-sm m-4">

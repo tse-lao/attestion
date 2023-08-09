@@ -17,7 +17,7 @@ export default  function Attestions() {
     setLoading(true)
     
     // Fetch data from your API here.
-    const APIURL = "https://api.studio.thegraph.com/query/49385/attestations/version/latest";
+    const APIURL = "https://api.studio.thegraph.com/query/49385/attestations/v2.0";
   
     const tokensQuery = `
     query {
@@ -42,6 +42,7 @@ export default  function Attestions() {
     client
       .query({
         query: gql(tokensQuery),
+        fetchPolicy: 'no-cache'
       })
       .then((data) =>{ 
         console.log("Subgraph data: ", data)
