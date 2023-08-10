@@ -67,7 +67,6 @@ export default function AttestationPage({
             mintPrice
             attestResolutionDays
             schemaUID
-            transactionHash
             resolver
             attestReward
           }
@@ -94,15 +93,12 @@ export default function AttestationPage({
         });
     };
     const getData = async (schemaUID: string) => {
-      const baseURL = `https://optimism-goerli.easscan.org/graphql`;
+      const baseURL = `https://optimism-goerli-bedrock.easscan.org/graphql`;
       const response = await axios.post<any>(
         `${baseURL}/graphql`,
         {
           query: `query FindFirstSchema($where: SchemaWhereUniqueInput!) {
             getSchema(where: $where) {
-              _count {
-                attestations
-              }
               creator
               id
               index

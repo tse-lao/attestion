@@ -60,7 +60,7 @@ export default function AttestionDetails({
     const getData = async () => {
       
       
-      const baseURL = `https://optimism-goerli.easscan.org/graphql`;
+      const baseURL = `https://optimism-goerli-bedrock.easscan.org/graphql`;
       const response = await axios.post<any>(
         `${baseURL}/graphql`,
         {
