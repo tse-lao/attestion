@@ -1,34 +1,135 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
+## API Endpoints to 
+### **Base URL**:
+```
+https://api.dataponte.com
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### **Library Service API**:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **Get Schema by ID**:
+```
+Endpoint: /library/schema/:schemaUID
+Method: GET
+Parameters:
+  - schemaUID (path parameter)
+  - clientId (query parameter, default = 420)
+```
+```javascript
+async function getSchemaById(schemaUID, clientId = 420) {
+  const response = await fetch(`https://localhost:4000/library/schema/${schemaUID}?clientId=${clientId}`);
+  return response.json();
+}
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+2. **Get All Schema**:
+```
+Endpoint: /library/all-schema
+Method: GET
+Parameters:
+  - chainId (query parameter)
+```
+```javascript
+async function getAllSchema(chainId) {
+  const response = await fetch(`https://localhost:4000/library/all-schema?chainId=${chainId}`);
+  return response.json();
+}
+```
 
-## Learn More
+3. **Get Both Schema**:
+```
+Endpoint: /library/both-schema
+Method: GET
+```
+```javascript
+async function getBothSchema() {
+  const response = await fetch(`https://localhost:4000/library/both-schema`);
+  return response.json();
+}
+```
 
-To learn more about Next.js, take a look at the following resources:
+4. **Get Schema Attestion**:
+```
+Endpoint: /library/schema-attestation/:schemaUID
+Method: GET
+Parameters:
+  - schemaUID (path parameter)
+  - clientId (query parameter, default = 420)
+```
+```javascript
+async function getSchemaAttestion(schemaUID, clientId = 420) {
+  const response = await fetch(`https://localhost:4000/library/schema-attestation/${schemaUID}?clientId=${clientId}`);
+  return response.json();
+}
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+5. **Get Attestation by ID**:
+```
+Endpoint: /library/attestation/:schemaUID
+Method: GET
+Parameters:
+  - schemaUID (path parameter)
+  - clientId (query parameter, default = 420)
+```
+```javascript
+async function getAttestationById(schemaUID, clientId = 420) {
+  const response = await fetch(`https://localhost:4000/library/attestation/${schemaUID}?clientId=${clientId}`);
+  return response.json();
+}
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+6. **Get Attestation by Address**:
+```
+Endpoint: /library/attestation-by-address/:recipient
+Method: GET
+Parameters:
+  - recipient (path parameter)
+  - clientId (query parameter, default = 420)
+```
+```javascript
+async function getAttestationByAddress(recipient, clientId = 420) {
+  const response = await fetch(`https://localhost:4000/library/attestation-by-address/${recipient}?clientId=${clientId}`);
+  return response.json();
+}
+```
 
-## Deploy on Vercel
+7. **Get All Attestation**:
+```
+Endpoint: /library/all-attestation
+Method: GET
+Parameters:
+  - recipient (query parameter)
+  - chainId (query parameter)
+```
+\```javascript
+async function getAllAttestation(recipient, chainId) {
+  const response = await fetch(`https://localhost:4000/library/all-attestation?recipient=${recipient}&chainId=${chainId}`);
+  return response.json();
+}
+\```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+8. **Get Both Attestions**:
+\```
+Endpoint: /library/both-attestations
+Method: GET
+\```
+\```javascript
+async function getBothAttestions() {
+  const response = await fetch(`https://localhost:4000/library/both-attestations`);
+  return response.json();
+}
+\```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+9. **Get Attestation**:
+\```
+Endpoint: /library/attestation
+Method: GET
+Parameters:
+  - recipient (query parameter)
+  - chainId (query parameter, default = 420)
+\```
+\```javascript
+async function getAttestation(recipient, chainId = 420) {
+  const response = await fetch(`https://localhost:4000/library/attestation?recipient=${recipient}&chainId=${chainId}`);
+  return response.json();
+}
+```

@@ -116,7 +116,7 @@ export default function SchemaForm({
 
   const submitData = async () => {
     setLoading(true);
-    const EASoGoerli = "0x1a5650d0ecbca349dd84bafa85790e3e6955eb84";
+    const EASoGoerli = "0x4200000000000000000000000000000000000021";
     const eas = new EAS(EASoGoerli);
 
     //const signer = walletClientToSigner(walletCline);
