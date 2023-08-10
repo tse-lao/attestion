@@ -10,7 +10,7 @@ import worldcoinAbi from "../abi/worldcoin.json";
 export const CONTRACTS = {
   attestionFactory: {
     420: {
-      contract: "0xad8BC443766AaA8ffB214fD2F8E1Dc5Cac7F6B0D" as Address,
+      contract: "0x4023B304553184AA15105418Ef00EA69Fb13a562" as Address,
       abi: attestationFactoryAbi,
     },
     84531: {
@@ -21,7 +21,7 @@ export const CONTRACTS = {
 
   attestation: {
     420: {
-      contract: "0xe7504d660C81DB4789E1bb2d4A8134d6505f7D04" as Address,
+      contract: "0xCb322BA199Df65C793A93F1ac2ECf49Ab00f19F3" as Address,
       abi: attestationAbi,
     },
     84531: {
@@ -35,7 +35,7 @@ export const CONTRACTS = {
       abi: worldcoinAbi,
     },
     84531: {
-      contract: "0x00" as Address,
+      contract: "0x2B4b59510E206894f3F6b28FadBe9138072BA8F7" as Address,
       abi: worldcoinAbi,
     },
   },

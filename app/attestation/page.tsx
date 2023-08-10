@@ -17,7 +17,7 @@ export default  function Attestions() {
     setLoading(true)
     
     // Fetch data from your API here.
-    const APIURL = "https://api.studio.thegraph.com/query/49385/attestations/v2.0";
+    const APIURL = "https://api.studio.thegraph.com/query/49385/attestations/latest";
   
     const tokensQuery = `
     query {
@@ -26,6 +26,7 @@ export default  function Attestions() {
         name
         description
         schemaUID
+        tags
         attestResolutionDays
         isMintable
         mintPrice
@@ -59,7 +60,7 @@ export default  function Attestions() {
 
   return (
     <main className="m-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 items-start justify-center">
+      <div className="grid grid-cols-1 sm:grid-cols-2  lg:grid-cols-4 gap-8 items-start justify-center">
         {data?.map((item, index) => (
           <AttestionItem key={index} schema={item} />
         ))}

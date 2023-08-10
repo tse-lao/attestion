@@ -35,6 +35,22 @@ export default function AttestationPage({
     functionName: "mint",
     args: [details.mintPrice, details.schemaUID],
   });
+  const {
+    isLoading: resolveLoading,
+    write: resolve,
+  } = useContractWrite({
+    address: CONTRACTS.attestation[420].contract,
+    abi: CONTRACTS.attestation[420].abi,
+    functionName: "resolveAttestations",
+  });
+  const {
+    isLoading: splitLoading,
+    write: splitFunds,
+  } = useContractWrite({
+    address: CONTRACTS.attestation[420].contract,
+    abi: CONTRACTS.attestation[420].abi,
+    functionName: "splitMintingFunds",
+  });
 
   useEffect(() => {
     const getDetails = async () => {
@@ -183,8 +199,39 @@ export default function AttestationPage({
 
           <div className="flex flex-col gap-4">
             {hasAccess.fileAccess ? (
-              <Button>Access Provided</Button>
-            ) : details.isMintable ? (
+                details.isMintable ? (
+               <Button
+               onClick={() => {
+                 resolve();
+               }}
+               disabled={resolveLoading}
+             >
+               {resolveLoading ? (
+                 <>
+                   <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />{" "}
+                   Resolving...
+                 </>
+               ) : (
+                 "Resolve Attestations"
+               )}
+             </Button>
+                ): (
+             <Button
+               onClick={() => {
+                 splitFunds();
+               }}
+               disabled={splitLoading}
+             >
+               {splitLoading ? (
+                 <>
+                   <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />{" "}
+                   Splitting...
+                 </>
+               ) : (
+                 "Splitting Funds"
+               )}
+             </Button>
+            )) : details.isMintable ? (
               <Button onClick={() => mint()} disabled={minting}>
                 {minting ? (
                   <>

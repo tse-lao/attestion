@@ -27,7 +27,7 @@ export default function SchemaList({list}: {list?: string}) {
     }, [list])
     
   return (
-    <div className={`grid grid-cols-4 m-2`}>
+    <div className={`flex gap-2 m-2`}>
         {schema.map((item, index) => (
             <SchemaItem key={index} name={item.name} type={item.type} />
         ))}

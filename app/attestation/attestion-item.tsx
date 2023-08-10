@@ -1,5 +1,5 @@
 "use client";
-import AccessType from "@/components/core/attestation/access-type";
+import { Badge } from "@/components/ui/badge";
 import axios from "axios";
 import {
   BookLockIcon,
@@ -78,19 +78,22 @@ export default function AttestionItem({ schema}: {schema: any}) {
           <div className="text-xl text-white hover:text-green-300" >{schema.name}</div>
       </div>
       <div>
-      <span className="text-gray-200 italic font-light text-sm m-4">
+      <div className="text-gray-200 font-light text-sm m-2">
         {schema.description}
-       </span>
+       </div>
     </div>
-    <div className="grid md:grid-cols-2 gap-2">
-      <AccessType type="Revoke Access" access={false} />
-      <AccessType type="schema Access" access={true} />
+    <div>
+      {schema.tags?.map((tag: string) => (
+        <Badge key={tag} className="bg-gray-700 text-gray-200 m-1">
+          {tag}
+        </Badge>
+        ))}
     </div>
     
-    <div className="grid grid-cols-3  m-4 items-center text-center">
+    <div className="grid  m-4 items-start gap-2 ">
       <IconItem icon={<TimerIcon />} value={schema.attestResolutionDays} />
       { schema.isMintable ? <IconItem icon={<BookOpenCheckIcon />} value="Open" /> : <IconItem icon={<BookLockIcon />} value="Close" />}
-      { schema.isMintable ? <IconItem icon={<CoinsIcon />} value={formatEther(schema.mintPrice)} /> :  <IconItem icon={<GemIcon />} value={formatEther(schema.attestReward)} />}
+      { schema.isMintable ? <IconItem icon={<CoinsIcon />} value={formatEther(schema.mintPrice)} /> :  <IconItem icon={<GemIcon />} value={schema.attestReward} />}
      
     </div>
 
@@ -107,7 +110,7 @@ export default function AttestionItem({ schema}: {schema: any}) {
 export function IconItem({ icon, value }: { icon: any, value: any }) {
   
   return(
-    <div className="flex flex-col gap-2 justify-center items-center">
+    <div className="flex gap-5 items-center">
         <div className="text-green-300">
         {icon}
         </div>  

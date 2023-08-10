@@ -1,5 +1,4 @@
 "use client";
-import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -11,11 +10,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 import SchemaForm from "@/components/core/attestation/schema/schema-form";
 import Loading from "@/components/core/loading/loading";
-import { CONTRACTS } from "@/constants/contracts";
-import { ReloadIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useContractWrite } from "wagmi";
 import AttestionData from "./attestion-table/attestion-data";
 import ResolveData from "./resolve-table/resolve-data";
 
@@ -53,22 +49,7 @@ export default function AttestionDetails({
   resolutionDays: number;
   details:any;
 }) {
-  const {
-    isLoading: resolveLoading,
-    write: resolve,
-  } = useContractWrite({
-    address: CONTRACTS.attestation[420].contract,
-    abi: CONTRACTS.attestation[420].abi,
-    functionName: "resolveAttestations",
-  });
-  const {
-    isLoading: splitLoading,
-    write: splitFunds,
-  } = useContractWrite({
-    address: CONTRACTS.attestation[420].contract,
-    abi: CONTRACTS.attestation[420].abi,
-    functionName: "splitMintingFunds",
-  });
+
 
   const [data, setData] = useState<Attestion[]>([]);
   const [listAttest, setListAttest] = useState<Attestion[]>([]);
@@ -192,38 +173,7 @@ export default function AttestionDetails({
         {hasAccess.revoke ? (
           <div>
             <ResolveData id={id} attestations={attestations} />
-            <div className="grid grid-cols-2 gap-8">
-              <Button
-                onClick={() => {
-                  resolve();
-                }}
-                disabled={resolveLoading}
-              >
-                {resolveLoading ? (
-                  <>
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />{" "}
-                    Resolving...
-                  </>
-                ) : (
-                  "Resolve Attestations"
-                )}
-              </Button>
-              <Button
-                onClick={() => {
-                  splitFunds();
-                }}
-                disabled={splitLoading}
-              >
-                {splitLoading ? (
-                  <>
-                    <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />{" "}
-                    Splitting...
-                  </>
-                ) : (
-                  "Splitting Funds"
-                )}
-              </Button>
-            </div>
+         
           </div>
         ) : (
           <span>No access </span>

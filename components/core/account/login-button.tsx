@@ -1,4 +1,6 @@
 "use client"
+import { Avatar, AvatarFallback, AvatarImage } from '@radix-ui/react-avatar';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { useAccount, useBalance, useConnect, useNetwork } from 'wagmi';
 import ProfileDetails from './profile-details';
@@ -8,7 +10,7 @@ import ProfileDetails from './profile-details';
 export default function LoginButton() {
   const { connect, connectors } = useConnect();
   const { address, status, isConnected, isConnecting, isReconnecting, isDisconnected } = useAccount();
-  const { chain } = useNetwork()
+  const { chain, chains } = useNetwork()
   const [showModal, setShowModal] = useState(false);
   const {data:balance} = useBalance({address:address})
 
@@ -53,11 +55,38 @@ export default function LoginButton() {
       <div className="flex rounded-md  items-center gap-2">
         <button className=' bg-gray-800 py-1 px-4 outline rounded-md outline-gray-900 text-md overflow truncate tracking-wider hover:outline-indigo-500' onClick={() => setShowModal(!showModal)}>
           {truncateTextMiddle(address, 13)}
-          
           {showModal && <ProfileDetails address={address} showModal={showModal} setShowModal={setShowModal} />}
-
         </button>
-      </div>
+        {chain?.id == 420 && (
+          <Avatar className="flex h-9 w-9 items-center justify-center space-y-0 border rounded-full">
+          <AvatarImage
+            src="https://ipfs.io/ipfs/bafkreicl7z5dtm4l27p3nzwfzkkowyg2h4uukmd2hjchjnr4xwkvvrgy6i"
+            alt="Avatar"
+          />
+          <AvatarFallback>OP</AvatarFallback>
+        </Avatar>
+        )}
+        {chain?.id == 420 && (
+
+          <div className="h-9 w-9 rounded-full relative">
+          <Image
+            src="https://ipfs.io/ipfs/bafkreiakkhglt2w4zcq42jostqesnyaruaqgpt2rv5mk3twq2zsoockbb4"
+            alt="Avatar"
+            objectFit="contain"
+            layout="fill"
+          />
+
+          </div>
+
+        )}
+        
+        
+
+            
+        
+        
+        </div>
+        
 
     )
   }

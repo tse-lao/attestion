@@ -19,6 +19,8 @@ import { CONTRACTS } from "@/constants/contracts";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { PlusIcon } from "lucide-react";
 import { useState } from "react";
+//@ts-ignore
+import TagsInput from 'react-tagsinput';
 import { toast } from "react-toastify";
 import { Address, useContractWrite, usePublicClient } from "wagmi";
 export type RevokerItem = {
@@ -35,7 +37,7 @@ export default function CreateAttestion() {
   const [formData, setFormData] = useState({
     name: "HealthCare Data",
     description: "lorem ipsum health care data is important to track since it provides a global benefit of many things",
-    categories: "'health', 'care'", // comma separated list of categories
+    categories: [], // comma separated list of categories
     attestRevokePeriod: "100",
     resolutionDays: 100,
     mintPrice: 0,
@@ -76,7 +78,9 @@ export default function CreateAttestion() {
   
   
 
-  
+  const handleTagChange = (tags:any) => {
+    setFormData({ ...formData, categories: tags });
+};
   const addSchemaInput = () => {
     /* if (formData.schemaInput.name == "" || formData.schemaInput.type == "") {
       toast.error("Please fill out the name and type");
@@ -171,7 +175,7 @@ export default function CreateAttestion() {
     let params = [
       formData.name,
       formData.description,
-      ["test data", "no meaning"],
+      formData.categories,
       days,
       formData.schema,
       formData.mintPrice,
@@ -342,16 +346,9 @@ export default function CreateAttestion() {
           </div>
           <div className="items-center gap-1.5">
             <Label htmlFor="picture">Categories</Label>
-            <Input
-              name="categories"
-              type="text"
-              value={formData.categories}
-              onChange={handleChange}
-              placeholder="Seperate with , "
-              required={true}
-            />
+            <TagsInput value={formData.categories} onChange={handleTagChange} />
           </div>
-          <div className="grid grid-cols-6 items-end gap-2">
+          <div className="grid grid-cols-6 items-end gap-2 hidden">
             <div  className="col-span-2">
             <Label htmlFor="resolutionDays">Create Input</Label>
             <Input
@@ -404,7 +401,7 @@ export default function CreateAttestion() {
               <PlusIcon className="h-5 w-5" />
             </Button>
           </div>
-          <div className="grid grid-cols-4">
+          <div className="grid grid-cols-4 hidden">
             <SchemaList list={formData.schema} />
           </div>
           
@@ -474,7 +471,7 @@ export default function CreateAttestion() {
           </div>
               
               {/* ATTESTATION ACCESS */}
-          <div className="grid grid-cols-7 w-full  items-end gap-2">
+          <div className="grid sm:grid-cols-7 w-full  items-end gap-2">
             <div className="col-span-2">
               <Label htmlFor="picture">Access Providers</Label>
               <Select
