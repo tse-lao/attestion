@@ -1,6 +1,4 @@
-"use client";
 import { Badge } from "@/components/ui/badge";
-import axios from "axios";
 import {
   BookLockIcon,
   BookOpenCheckIcon,
@@ -10,7 +8,6 @@ import {
   TimerIcon
 } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { formatEther } from 'viem';
 
 export function AttestionAccess() {
@@ -23,57 +20,11 @@ export function AttestionAccess() {
 }
 
 export default function AttestionItem({ schema}: {schema: any}) {
-  const [data, setData] = useState<any>({})
-  
-  useEffect(() => {
-    const getData = async () => {
-        const baseURL = `https://optimism-goerli.easscan.org/graphql`;
-        const response = await axios.post<any>(
-          `${baseURL}/graphql`,
-          {
-            query:
-              `query FindFirstSchema($where: SchemaWhereUniqueInput!) {
-                getSchema(where: $where) {
-                  _count {
-                    attestations
-                  }
-                  creator
-                  id
-                  index
-                  resolver
-                  revocable
-                  schema
-                  txid
-                  time
-                }
-              }`,
-            variables: {
-              where: {
-                id: schema.schemaUID,
-              },
-            },
-          },
-          {
-            headers: {
-              "content-type": "application/json",
-            },
-          }
-        );
-       
-        setData(response.data.data.getSchema)
-        //fix schema 
-        console.log(response.data.data.getSchema)
-      
-    }
-    if(schema){
-      getData();
-    }
-  }, [schema])
-  
+
   
   if(schema){
     return (
-      <Link className="bg-gray-600 rounded-md p-4 flex flex-col gap-4 hover:outline hover:outline-green-300"  href={`/attestation/${schema.id}`}>
+      <Link className="bg-gray-600 rounded-md p-4 flex flex-col gap-4 hover:outline hover:outline-green-300"  href={`/attestation/${schema.schemaUID}`}>
       <div className="flex justify-between pt-4 px-4">
           <div className="text-xl text-white hover:text-green-300" >{schema.name}</div>
       </div>

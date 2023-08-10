@@ -1,7 +1,7 @@
 "use client"
 import Loading from "@/components/core/loading/loading";
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { useEffect, useState } from "react";
+import { useNetwork } from "wagmi";
 import AttestionItem from "./attestion-item";
 
 
@@ -9,52 +9,29 @@ import AttestionItem from "./attestion-item";
 export default  function Attestions() {
   const [loading, setLoading] = useState(true);
   const [data, setData] = useState([])
+  const {chain} = useNetwork()
   useEffect(() => {
-    getData();
-  }, [])
-  
-  async function getData() {
     setLoading(true)
-    
-    // Fetch data from your API here.
-    const APIURL = "https://api.studio.thegraph.com/query/49385/attestations/version/latest";
-  
-    const tokensQuery = `
-    query {
-      schemaRegistereds(first: 5) {
-        id
-        name
-        description
-        schemaUID
-        tags
-        attestResolutionDays
-        isMintable
-        mintPrice
-        attestReward
-      }
+    async function getAllSchema(chainId:number) {
+      const api = process.env.API || "http://localhost:4000";
+
+      const response = await fetch(`${api}/library/all-schema?chainId=${chainId}`);
+      const result = await response.json();
+      console.log(result)
+      setData(result) 
+
     }
-  `;
+    
+    if(chain){
+      if(chain.id > 0){
+        getAllSchema(chain.id);
+      }
+      getAllSchema(420);
+    }
+    setLoading(false)
+  }, [chain])
   
-    const client = new ApolloClient({
-      uri: APIURL,
-      cache: new InMemoryCache(),
-    });
-  
-    client
-      .query({
-        query: gql(tokensQuery),
-        fetchPolicy: 'no-cache'
-      })
-      .then((data) =>{ 
-        console.log("Subgraph data: ", data)
-        setData(data.data.schemaRegistereds)
-      })
-      .catch((err) => {
-        console.log("Error fetching data: ", err);
-      });
-      
-      setLoading(false)
-  }
+
 
   if(loading) return <Loading />
 

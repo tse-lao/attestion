@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
 import { ArrowUpDown } from "lucide-react"
+import { useEffect, useState } from "react"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -31,25 +32,37 @@ export const resolveColumns: ColumnDef<Attestion>[] = [
       )
     },
   },
-  
   {
     accessorKey: "decodedDataJson",
-    header: "decodedDataJson",
+    header: "name",
+    cell: ({ row }) => {
+      const data = row.getValue("decodedDataJson") as any;
+ 
+      return <div className="text-right font-medium">{data.name}</div>
+    },
+  },
+  {
+    accessorKey: "decodedDataJson",
+    header: "file",
+    cell: ({ row }) => {
+      const data = row.getValue("decodedDataJson") as any
+ 
+      return <div className="text-right font-medium">{data.file}</div>
+    },
+  },
+  {
+    accessorKey: "decodedDataJson",
+    header: "description",
+    cell: ({ row }) => {
+      const data = row.getValue("decodedDataJson") as any;
+ 
+      return <div className="text-right font-medium">{data.description}</div>
+    },
   },
   {
     accessorKey: "timeCreated",
     header: "timeCreated",
-    cell: ({ row }) => {
-      const futureTimestamp = parseFloat(row.getValue("timeCreated"))
-      let countdownInterval:any = setInterval(() => {
-        let currentTimestamp = Math.floor(Date.now() / 1000);
-        let secondsLeft = futureTimestamp - currentTimestamp;
-        return secondsLeft; 
-        
-    }, 1000);
- 
-      return <div className="text-right font-medium">{countdownInterval}</div>
-    },
+    cell: ({ row }) => <CountdownCell futureTimestamp={parseFloat(row.getValue("timeCreated"))} />
   },
   {
     id: "select",
@@ -71,3 +84,18 @@ export const resolveColumns: ColumnDef<Attestion>[] = [
     enableHiding: false,
   },
 ]
+
+const CountdownCell = ({ futureTimestamp }:{futureTimestamp:number}) => {
+  const [secondsLeft, setSecondsLeft] = useState(futureTimestamp - Math.floor(Date.now() / 1000));
+
+  useEffect(() => {
+      const interval = setInterval(() => {
+          let currentTimestamp = Math.floor(Date.now() / 1000);
+          setSecondsLeft(futureTimestamp - currentTimestamp);
+      }, 1000);
+
+      return () => clearInterval(interval); // Clean up on component unmount
+  }, [futureTimestamp]);
+
+  return <div className="text-right font-medium">{secondsLeft}</div>;
+}

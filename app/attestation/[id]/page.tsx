@@ -4,10 +4,8 @@ import SchemaList from "@/components/core/attestation/schema/schema-list";
 import Loading from "@/components/core/loading/loading";
 import { Button } from "@/components/ui/button";
 import { CONTRACTS } from "@/constants/contracts";
-import { ApolloClient, InMemoryCache, gql } from "@apollo/client";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { readContract } from "@wagmi/core";
-import axios from "axios";
 
 import { Badge } from "@/components/ui/badge";
 import { useEffect, useState } from "react";
@@ -53,83 +51,19 @@ export default function AttestationPage({
   });
 
   useEffect(() => {
-    const getDetails = async () => {
-      const APIURL =
-        "https://api.studio.thegraph.com/query/49385/attestations/version/latest";
-      const tokensQuery = gql`
-        query SchemaByUID($id: String!) {
-          schemaRegistered(id: $id) {
-            id
-            name
-            description
-            isMintable
-            tags
-            mintPrice
-            attestResolutionDays
-            schemaUID
-            resolver
-            attestReward
-          }
-        }
-      `;
 
-      const client = new ApolloClient({
-        uri: APIURL,
-        cache: new InMemoryCache(),
-      });
+    //get by chain.id 
+    async function getSchemaById(schemaUID:string, clientId = 420) {
+      const api = process.env.API || "http://localhost:4000";
 
-      client
-        .query({
-          query: tokensQuery,
-          variables: { id: params.id }, // Replace 'YOUR_SCHEMA_UID_VALUE' with your actual value
-        })
-        .then((data) => {
-          console.log("Subgraph data: ", data);
-          setDetails(data.data.schemaRegistered);
-          getData(data.data.schemaRegistered.schemaUID);
-        })
-        .catch((err) => {
-          console.log("Error fetching data: ", err);
-        });
-    };
-    const getData = async (schemaUID: string) => {
-      const baseURL = `https://optimism-goerli-bedrock.easscan.org/graphql`;
-      const response = await axios.post<any>(
-        `${baseURL}/graphql`,
-        {
-          query: `query FindFirstSchema($where: SchemaWhereUniqueInput!) {
-            getSchema(where: $where) {
-              creator
-              id
-              index
-              resolver
-              revocable
-              schema
-              txid
-              time
-            }
-          }`,
-          variables: {
-            where: {
-              id: schemaUID,
-            },
-          },
-        },
-        {
-          headers: {
-            "content-type": "application/json",
-          },
-        }
-      );
-
-      setData(response.data.data.getSchema);
-      //fix schema
-      console.log(response.data.data.getSchema);
-      await getAccess(schemaUID);
-
-      setLoading(false);
-    };
-
+      const response = await fetch(`${api}/library/schema/${schemaUID}?clientId=${clientId}`);
+      const result = await response.json();
+      console.log(result);
+      setData(result);
+      setLoading(false)
+      
+    }
+    
     //get data from own GRAPH.
 
     const getAccess = async (schemaUID: string) => {
@@ -165,7 +99,8 @@ export default function AttestationPage({
 
     if ((params.id, address)) {
       setLoading(true);
-      getDetails();
+      getSchemaById(params.id);
+      getAccess(params.id)
     }
   }, [params, address]);
 
@@ -176,11 +111,11 @@ export default function AttestationPage({
         <div className="flex md:flex-row flex-col justify-between w-full gap-8">
           <div className="flex flex-col gap-4"> 
             <h1 className="text-left text-2xl tracking-wider font-light text-green-300">
-              {details.name}
+              {data.name}
             </h1>
-            <span className="text-sm text-left">{details.description}</span>
+            <span className="text-sm text-left">{data.description}</span>
             <div className="flex gap-2">
-                {details.tags?.map((tag: string, index:number) => (
+                {data.tags?.map((tag: string, index:number) => (
                   <Badge key={index}  color="var(--color-green-300)">
                     {tag}
                   </Badge>
@@ -195,7 +130,7 @@ export default function AttestationPage({
 
           <div className="flex flex-col gap-4">
             {hasAccess.fileAccess ? (
-                details.isMintable ? (
+                data.isMintable ? (
                <Button
                onClick={() => {
                  resolve();
@@ -227,7 +162,7 @@ export default function AttestationPage({
                  "Splitting Funds"
                )}
              </Button>
-            )) : details.isMintable ? (
+            )) : data.isMintable ? (
               <Button onClick={() => mint()} disabled={minting}>
                 {minting ? (
                   <>
@@ -236,12 +171,12 @@ export default function AttestationPage({
                 ) : (
                   "Mint to view attestions"
                 )}
-                Mint to view attestions {details.mintPrice} ETH
+                Mint to view attestions {data.mintPrice} ETH
               </Button>
             ) : (
               <Button disabled>Private DataPool</Button>
             )}
-            <span>{details.attestResolutionDays}</span>
+            <span>{data.attestResolutionDays}</span>
             <AccessType type="Revoke" access={hasAccess.revoke} />
             <AccessType type="Attest" access={hasAccess.attest} />
             <AccessType type="View" access={hasAccess.fileAccess} />
@@ -256,10 +191,10 @@ export default function AttestationPage({
       <AttestionDetails
         attestations={data._count?.attestations}
         id={data.id}
-        resolutionDays={details.attestResolutionDays}
+        resolutionDays={data.attestResolutionDays}
         schema={data.schema}
         hasAccess={hasAccess}
-        details={details}
+        details={data}
       />
     </main>
   );
