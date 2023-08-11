@@ -31,6 +31,7 @@ export type Attestion = {
   time:number;
   timeCreated:number;
   txid:string;
+  status:string;
 };
 
 export default function AttestionDetails({
@@ -52,7 +53,8 @@ export default function AttestionDetails({
 
   const [data, setData] = useState<Attestion[]>([]);
   const [listAttest, setListAttest] = useState<Attestion[]>([]);
-  const [listRevoker, setListRevoker] = useState<Attestion[]>([]);
+  const [listResolve, setListResolve] = useState<Attestion[]>([]);
+  const [listRevoke, setListRevoke] = useState<Attestion[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -62,7 +64,17 @@ export default function AttestionDetails({
         const response = await fetch(`${api}/library/attestation/${schemaUID}?clientId=${clientId}`);
         const result = await response.json();
         console.log(result);
+        
+        //filter attestions based on status and set to state
+        const resolve = result.filter((item:Attestion) => item.status == "Active");
+        const revoke = result.filter((item:Attestion) => item.status == "Revoke");
+        const attest = result.filter((item:Attestion) => item.status == "Expired");
+        
+        
         setData(result);
+        setListResolve(resolve);
+        setListRevoke(revoke);
+        setListAttest(attest);
         setLoading(false)
         return  result
 
@@ -97,12 +109,12 @@ export default function AttestionDetails({
         </Card>
       </TabsContent>
       <TabsContent value="view" className="w-full">
-        {hasAccess.attest ? <AttestionData id={id} attestations={data}/> : <div> No access </div>}
+        {hasAccess.attest ? <AttestionData id={id} attestations={listAttest}/> : <div> No access </div>}
       </TabsContent>
       <TabsContent value="revoke" className="w-full">
         {hasAccess.revoke ? (
           <div>
-            <ResolveData id={id} attestations={data} />
+            <ResolveData id={id} attestations={listResolve} />
          
           </div>
         ) : (

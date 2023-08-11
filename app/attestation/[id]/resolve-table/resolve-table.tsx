@@ -20,7 +20,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { useEthersSigner } from "@/lib/ethers"
+import { EAS } from "@ethereum-attestation-service/eas-sdk"
 import { useState } from "react"
+import { toast } from "react-toastify"
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -33,6 +36,7 @@ export function ResolveTable<TData, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [rowSelection, setRowSelection] = useState({})
+  const signer = useEthersSigner();
 
   const table = useReactTable({
     data,
@@ -49,9 +53,44 @@ export function ResolveTable<TData, TValue>({
 
   })
   
-  const showInfo = () => {
+  const revokeCid = async() => {
     console.log("testing if this display anything")
     console.log(table)
+    
+    const resolveId = table.getFilteredSelectedRowModel().rows.map((row) => {
+      //@ts-ignore
+      return row.original.id;
+    });
+    
+    const schema = table.getFilteredSelectedRowModel().rows.map((row) => {
+      //@ts-ignore
+      return row.original.schemaId;
+    });
+    
+    const EASoGoerli = "0x4200000000000000000000000000000000000021";
+    const eas = new EAS(EASoGoerli);
+
+    //const signer = walletClientToSigner(walletCline);
+
+      //@ts-ignore
+      eas.connect(signer);
+
+      
+      toast.promise(eas.revoke({
+        schema: schema[0], 
+        data: {
+          uid: resolveId[0]
+        }
+      }), 
+      {
+        pending: "Revoking CID",
+        success: "You succesfully revoked the attstation.",
+        error: "Error while revoking attestation."
+        })
+
+    
+    ///now we integrate eas. 
+    
   }
 
 
@@ -106,7 +145,7 @@ export function ResolveTable<TData, TValue>({
       <DataTablePagination table={table} />
     </div>
     <div className="text-right">
-      {table.getFilteredSelectedRowModel().rows.length  > 0 && <Button onClick={showInfo}>Resolve ({table.getFilteredSelectedRowModel().rows.length}) issues</Button>}
+      {table.getFilteredSelectedRowModel().rows.length  > 0 && <Button onClick={revokeCid}>Revoke ({table.getFilteredSelectedRowModel().rows.length}) issues</Button>}
     </div>
     </div>
   )

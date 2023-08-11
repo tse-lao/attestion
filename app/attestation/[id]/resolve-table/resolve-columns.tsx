@@ -91,7 +91,7 @@ const CountdownCell = ({ futureTimestamp }:{futureTimestamp:number}) => {
   useEffect(() => {
       const interval = setInterval(() => {
           let currentTimestamp = Math.floor(Date.now() / 1000);
-          setSecondsLeft(futureTimestamp - currentTimestamp);
+          setSecondsLeft(futureTimestamp + 3600 - currentTimestamp);
       }, 1000);
 
       return () => clearInterval(interval); // Clean up on component unmount

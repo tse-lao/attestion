@@ -7,8 +7,8 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'DataPonte Data Control',
-  description: 'Keep control of your data',
+  title: 'Libaries',
+  description: 'Share your data with the world',
 }
 
 export default function RootLayout({

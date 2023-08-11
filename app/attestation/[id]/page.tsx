@@ -8,6 +8,7 @@ import { ReloadIcon } from "@radix-ui/react-icons";
 import { readContract } from "@wagmi/core";
 
 import { Badge } from "@/components/ui/badge";
+import { secondsToDaysAndHours } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import { useAccount, useContractWrite } from "wagmi";
 import AttestionDetails from "./attestion-details";
@@ -121,6 +122,7 @@ export default function AttestationPage({
                   </Badge>
                   ))}
             </div>
+            <span className="text-gray-400 m-4">Resolution time: {secondsToDaysAndHours(data.attestResolutionDays)}</span>
             <h3 className="font-medium tracking-wider text-green-300">
             Schema Attributes
           </h3>
@@ -176,7 +178,7 @@ export default function AttestationPage({
             ) : (
               <Button disabled>Private DataPool</Button>
             )}
-            <span>{data.attestResolutionDays}</span>
+           
             <AccessType type="Revoke" access={hasAccess.revoke} />
             <AccessType type="Attest" access={hasAccess.attest} />
             <AccessType type="View" access={hasAccess.fileAccess} />

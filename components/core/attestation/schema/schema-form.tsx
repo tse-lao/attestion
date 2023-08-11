@@ -151,7 +151,6 @@ export default function SchemaForm({
     const newAttestationUID = await tx.wait();
 
     toast.success("New attestation has been made");
-    console.log(newAttestationUID)
     setLoading(false);
   };
 
@@ -198,7 +197,8 @@ export default function SchemaForm({
             {loading ? 
              <Button disabled>
               <ReloadIcon className="w-5 h-5 mr-2 animate-spin" /> Attesting...
-             </Button> :  <Button onClick={submitData}>Submit data</Button>
+             </Button> : 
+              <Button onClick={submitData}>Submit data</Button>
             }
      
     </div>

@@ -13,7 +13,7 @@ export default  function Attestions() {
   useEffect(() => {
     setLoading(true)
     async function getAllSchema(chainId:number) {
-      const api = process.env.API || "http://localhost:4000";
+      const api = process.env.NEXT_PUBLIC_API || "http://localhost:4000";
 
       const response = await fetch(`${api}/library/all-schema?chainId=${chainId}`);
       const result = await response.json();
