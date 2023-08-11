@@ -4,7 +4,7 @@ import { CONTRACTS } from '@/constants/contracts'
 import { decode } from '@/lib/wld'
 import { IDKitWidget, ISuccessResult } from '@worldcoin/idkit'
 import { useEffect, useState } from 'react'
-import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi'
+import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite, parseGwei } from 'wagmi'
 
 export default function Worldcoin() {
 	const { address } = useAccount()
@@ -33,7 +33,7 @@ export default function Worldcoin() {
 			setClaimed(true)
 			
 		}
-		setFees(readFees?.nativeFee)
+		setFees(readFees?.nativeFee * 1000000000)
 	}, [isClaimed,readFees])
 	
 	const { config } = usePrepareContractWrite({
@@ -41,7 +41,7 @@ export default function Worldcoin() {
 		abi: CONTRACTS.worldcoin[420].abi,
 		enabled: proof != null && address != null,
 		functionName: 'MintHumanBadge',
-		value: fees,
+		value: parseGwei(fees.toString()),
 		args: [
 			address!,
 			proof?.merkle_root ? decode<BigInt>('uint256', proof?.merkle_root ?? '') : BigInt(0),
