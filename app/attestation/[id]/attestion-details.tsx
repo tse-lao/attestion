@@ -60,7 +60,7 @@ export default function AttestionDetails({
   useEffect(() => {
     const getData = async (schemaUID:string, clientId = 420) => {
       
-        const api = process.env.API || "http://localhost:4000";
+        const api = process.env.NEXT_PUBLIC_API || "http://localhost:4000";
         const response = await fetch(`${api}/library/attestation/${schemaUID}?clientId=${clientId}`);
         const result = await response.json();
         console.log(result);

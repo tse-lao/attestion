@@ -55,7 +55,7 @@ export default function AttestationPage({
 
     //get by chain.id 
     async function getSchemaById(schemaUID:string, clientId = 420) {
-      const api = process.env.API || "http://localhost:4000";
+      const api = process.env.NEXT_PUBLIC_API || "http://localhost:4000";
 
       const response = await fetch(`${api}/library/schema/${schemaUID}?clientId=${clientId}`);
       const result = await response.json();
