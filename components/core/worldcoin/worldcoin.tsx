@@ -9,6 +9,7 @@ import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite 
 export default function Worldcoin() {
 	const { address } = useAccount()
 	const [claimed, setClaimed] = useState(false)
+	const [fees, setFees] = useState(0)
 	const [proof, setProof] = useState<ISuccessResult | null>(null)
 	const {data: isClaimed, isLoading} = useContractRead({
 		address: CONTRACTS.worldcoin[420].contract,
@@ -32,14 +33,15 @@ export default function Worldcoin() {
 			setClaimed(true)
 			
 		}
-	}, [isClaimed])
+		setFees(readFees?.nativeFee)
+	}, [isClaimed,readFees])
 	
 	const { config } = usePrepareContractWrite({
 		address: CONTRACTS.worldcoin[420].contract,
 		abi: CONTRACTS.worldcoin[420].abi,
 		enabled: proof != null && address != null,
 		functionName: 'MintHumanBadge',
-		value: readFees?.nativeFee,
+		value: fees,
 		args: [
 			address!,
 			proof?.merkle_root ? decode<BigInt>('uint256', proof?.merkle_root ?? '') : BigInt(0),
