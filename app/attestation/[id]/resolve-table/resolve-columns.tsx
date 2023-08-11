@@ -1,9 +1,8 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
-import { ArrowUpDown } from "lucide-react"
+import Link from "next/link"
 import { useEffect, useState } from "react"
 
 // This type is used to define the shape of our data.
@@ -20,16 +19,11 @@ export type Attestion = {
 export const resolveColumns: ColumnDef<Attestion>[] = [
   {
     accessorKey: "attester",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        >
-          Attester
-          <ArrowUpDown className="ml-2 h-4 w-4" />
-        </Button>
-      )
+    header: "attester",
+    cell: ({ row }) => {
+      const attester = row.getValue("attester") as any;
+ 
+      return <Link className="text-right font-medium text-green-300 hover:text-green-500" href={`/profile/${attester}`}>View Attester</Link>
     },
   },
   {

@@ -1,3 +1,4 @@
+import Worldcoin from "@/components/core/worldcoin/worldcoin";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 // components/ProfitContributions.tsx
@@ -7,6 +8,7 @@ interface ProfitContributionsProps {
   totalContributions: number;
   approvedContributions: number;
   profitGrowth: number;
+  user: boolean;
 }
 
 const ProfitContributions: React.FC<ProfitContributionsProps> = ({
@@ -14,6 +16,7 @@ const ProfitContributions: React.FC<ProfitContributionsProps> = ({
   totalContributions,
   approvedContributions,
   profitGrowth,
+  user,
 }) => {
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 m-8">
@@ -34,11 +37,12 @@ const ProfitContributions: React.FC<ProfitContributionsProps> = ({
           </svg>
         </CardHeader>
         <CardContent>
-          {false ? (
-            <div className="text-2xl text-green-300 font-bold">Verified</div>
+          {user ? (
+            <Worldcoin />
           ) : (
-            <div className="text-2xl text-red-400 font-bold">Not Verified</div>
+            <div className="text-2xl text-red-400 font-bold">Check address</div>
           )}
+
           <p className="text-xs text-muted-foreground">
             {false
               ? "Verified on 12 october 2023"

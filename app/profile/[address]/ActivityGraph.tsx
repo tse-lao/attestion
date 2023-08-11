@@ -55,7 +55,9 @@ const data = [
 
 export function ActivityGraph() {
   return (
-    <ResponsiveContainer width="100%" height={350}>
+    <div>
+      <h1 className="text-2xl font-bold mb-4">Transaction chart</h1>
+        <ResponsiveContainer width="100%" height={350}>
       <BarChart data={data}>
         <XAxis
           dataKey="name"
@@ -74,5 +76,8 @@ export function ActivityGraph() {
         <Bar dataKey="total" fill="#86efac" radius={[4, 4, 0, 0]} />
       </BarChart>
     </ResponsiveContainer>
+      
+    </div>
+  
   )
 }

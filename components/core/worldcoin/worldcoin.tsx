@@ -3,19 +3,37 @@ import { Button } from '@/components/ui/button'
 import { CONTRACTS } from '@/constants/contracts'
 import { decode } from '@/lib/wld'
 import { IDKitWidget, ISuccessResult } from '@worldcoin/idkit'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi'
 
 export default function Worldcoin() {
 	const { address } = useAccount()
+	const [claimed, setClaimed] = useState(false)
 	const [proof, setProof] = useState<ISuccessResult | null>(null)
 	const {data: isClaimed, isLoading} = useContractRead({
 		address: CONTRACTS.worldcoin[420].contract,
 		abi: CONTRACTS.worldcoin[420].abi,
-		functionName: 'isClaimed',
+		functionName: 'balanceOf',
 		args: [address],
 	});
+	
+	const {data: readFees, isLoading: readFeesLoading} = useContractRead({
+		address: CONTRACTS.worldcoin[420].contract,
+		abi: CONTRACTS.worldcoin[420].abi,
+		functionName: 'estimateFees',
+		args: ["0x00010000000000000000000000000000000000000000000000000000000000030d40", address],
+	});
 
+	useEffect(() => {
+
+		if(isClaimed == "0n"){
+			setClaimed(false)
+		}else{
+			setClaimed(true)
+			
+		}
+	}, [isClaimed])
+	
 	const { config } = usePrepareContractWrite({
 		address: CONTRACTS.worldcoin[420].contract,
 		abi: CONTRACTS.worldcoin[420].abi,
@@ -41,6 +59,8 @@ export default function Worldcoin() {
 						BigInt(0),
 				  ],
 		],
+		//@ts-ignore
+		gas: readFees?.gas,
 	})
 	const { write } = useContractWrite(config)
 
@@ -48,7 +68,7 @@ export default function Worldcoin() {
 	return (
 		<main>
 			{address ? (
-				!isClaimed ? (
+				claimed ? (
 				proof ? (
 					<Button onClick={write}
                         className="hover:bg-purple-700"

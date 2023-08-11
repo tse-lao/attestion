@@ -2,6 +2,7 @@
 
 import { Checkbox } from "@/components/ui/checkbox"
 import { ColumnDef } from "@tanstack/react-table"
+import Link from "next/link"
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -17,7 +18,12 @@ export type Attestion = {
 export const AttestionColumns: ColumnDef<any>[] = [
   {
     accessorKey: "attester",
-    header: "attestest",
+    header: "attester",
+    cell: ({ row }) => {
+      const attester = row.getValue("attester") as any;
+ 
+      return <Link className="text-right font-medium text-green-300 hover:text-green-500" href={`/profile/${attester}`}>View Attester</Link>
+    },
   },
   {
     accessorKey: "decodedDataJson",

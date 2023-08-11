@@ -29,7 +29,7 @@ function getRandomGamerName(): string {
   return (
     <div className="flex flex-col gap-8 items-center">
       {/* This will be the top profile item */}
-      <div className="items-center mx-auto">
+      <div className="items-center mx-auto flex flex-col justify-center">
         <div className="rounded-md relative h-[150px] w-[150px]">
           <Image
             src="https://ipfs.io/ipfs/bafybeiafbapjoweekp2bkk7opijf7ysveq6zy4hkptomarcynofx3poieu"
@@ -45,9 +45,9 @@ function getRandomGamerName(): string {
         </div>
       </div>
       <div className="w-full grid grid-cols-3 gap-1 text-center py-2 divide-x divide-gray-400">
-        <StatItem title="Vaults" value={totalTokens.toString()} />
+        <StatItem title="Vaults" value="N/A" />
         <StatItem title="Submitted" value={totalTokens.toString()} />
-        <StatItem title="Acceptance" value={totalTokens.toString()} />
+        <StatItem title="Acceptance" value="N/A" />
       </div>
     </div>
   );

@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
-import { ActivityGraph } from "./ActivityGraph";
 import ProfitContributions from "./ProfitContributions";
 import TransactionsList from "./TransactionList";
 import UserDetails from "./UserDetails";
@@ -23,7 +22,7 @@ export default function ProfilePage({
   
     //get all the transaction multichain. 
     async function getAttestationByAddress(recipient:string, clientId = 420) {
-      const api = process.env.API || "http://localhost:4000";
+      const api = process.env.NEXT_PUBLIC_API || "http://localhost:4000";
       const response = await fetch(`${api}/library/attestation-by-address/${recipient}?clientId=${clientId}`);
       const result = await response.json();
       console.log(result);
@@ -54,12 +53,13 @@ export default function ProfilePage({
             totalContributions={20}
             approvedContributions={15}
             profitGrowth={7}
+            user={false}
           />
           <div className="grid grid-cols-2 gap-8 m-12">
             <TransactionsList
               transactions={transactions}
             />
-            <ActivityGraph />
+
           </div>
         </main>
       </div>

@@ -1,5 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, XIcon } from "lucide-react";
 
 // components/TransactionsList.tsx
 
@@ -19,7 +19,10 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
 
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 my-5">
+      <h1 className="text-gray-300 text-xl font-semibold">
+        Latest Transactions
+      </h1>
       {transactions.map((transaction:any, index) => (
         <div key={index} className="flex items-center">
           <Avatar className="h-9 w-9">
@@ -43,7 +46,7 @@ const TransactionsList: React.FC<TransactionsListProps> = ({
               {transaction.txid}
             </p>
           </div>
-          <div className="ml-auto font-medium">{transaction?.revoked ? <CheckIcon className="bg-red-400"/> : <CheckIcon className="bg-green-400" />}</div>
+          <div className="ml-auto font-medium">{transaction?.revoked ? <XIcon className="text-red-600"/> : <CheckIcon className="text-green-400" />}</div>
         </div>
       ))}
 
