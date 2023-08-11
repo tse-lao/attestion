@@ -60,7 +60,7 @@ export default function Worldcoin() {
 				  ],
 		],
 		//@ts-ignore
-		gas: readFees?.gas,
+		value: readFees?.nativeFee,
 	})
 	const { write } = useContractWrite(config)
 
