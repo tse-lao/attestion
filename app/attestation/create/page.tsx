@@ -14,10 +14,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { parseEther } from 'viem';
+
 import { Textarea } from "@/components/ui/textarea";
 import { CONTRACTS } from "@/constants/contracts";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { PlusIcon } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 //@ts-ignore
 import TagsInput from 'react-tagsinput';
@@ -39,7 +42,7 @@ export default function CreateAttestion() {
     description: "lorem ipsum health care data is important to track since it provides a global benefit of many things",
     categories: [], // comma separated list of categories
     attestRevokePeriod: "100",
-    resolutionDays: 100,
+    resolutionDays: 10,
     mintPrice: 0,
     schemaInput: {
       name: "",
@@ -50,7 +53,7 @@ export default function CreateAttestion() {
     attesterToken: "0x0000000000000000000000000000000000000000",
     attesterTokenID: 0,
     attesterStatus: 0,
-    attestReward: 1,
+    attestReward: 0,
     isMintable: false,
     revokerToken: "0x0000000000000000000000000000000000000000",
     revokerTokenID: 0,
@@ -70,7 +73,7 @@ export default function CreateAttestion() {
     functionName: "createSuperSchema",
   });
   
-  const { data:customData, isSuccess:customSuccess, write:customCreate} = useContractWrite({
+  const { data:customData, isLoading:loadingTokenCreate, isSuccess:customSuccess, write:customCreate} = useContractWrite({
     address: CONTRACTS.tokenCreator[420].contract,
     abi: CONTRACTS.tokenCreator[420].abi,
     functionName: "createAccessControlContract",
@@ -171,15 +174,15 @@ export default function CreateAttestion() {
     }
     
     //convert to days.. 
-    const days = formData.resolutionDays * 86400;
+    const days = formData.resolutionDays * 3600;
     let params = [
       formData.name,
       formData.description,
       formData.categories,
       days,
       formData.schema,
-      formData.mintPrice,
-      formData.attestReward,
+      parseEther(formData.mintPrice.toString()),
+      parseEther(formData.attestReward.toString()),
       formData.isMintable,
     ];
     
@@ -314,13 +317,28 @@ export default function CreateAttestion() {
     setCustomAttesters(prevAddresses => [...prevAddresses, address]);
     
   }
+  
+  if(isSuccess){
+  
+    return (
+      <main>
+        <div className=" p-8 m-12 rounded-md flex flex-col justify-center items-center">
+            <h1>Succesfully create library</h1>
+            <Link href="/attestation">
+              Go to libraries
+              </Link>
+          </div>
+        </main>
+    )
+  }
+  
   return (
     <main>
       {showRModal && <CustomAddress addresses={customRevokers} addAddress={addRevokeAddress} showModal={showRModal} setShowModal={setShowRModal} />}
       {showAModal && <CustomAddress addresses={customAttesters} addAddress={addAttestAddress} showModal={showAModal} setShowModal={setShowAModal} />}
       <div className=" p-8 m-12 rounded-md flex flex-col justify-center items-center">
         <h1 className="text-center text-2xl mb-4 text-green-300">
-          Create Data Vault
+          Create  Library
         </h1>
         <div className="flex flex-col gap-8 bg-gray-600 rounded-md p-12 w-full max-w-2xl">
           <div className="items-center gap-1.5">
@@ -685,6 +703,7 @@ export default function CreateAttestion() {
               <Button
                 className="w-full bg-green-300 text-gray-900 hover:text-green-300"
                 onClick={handleSubmit}
+                disabled
               >
                 <ReloadIcon className="mr-2 h-4 w-4 animate-spin" /> Loading...
               </Button>
@@ -694,7 +713,7 @@ export default function CreateAttestion() {
                 onClick={handleSubmit}
               >
                 <PlusIcon className="mr-2 h-4 w-4" />{" "}
-                <span> Create Data Vault</span>
+                <span> Create Library</span>
               </Button>
             )}
           </div>

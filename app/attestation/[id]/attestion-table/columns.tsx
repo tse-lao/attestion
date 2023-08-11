@@ -21,27 +21,30 @@ export const AttestionColumns: ColumnDef<any>[] = [
   },
   {
     accessorKey: "decodedDataJson",
-    header: "Name",
+    header: "name",
     cell: ({ row }) => {
-      const data = row.getValue("attester") as string;
-      return data;
-    }
+      const data = row.getValue("decodedDataJson") as any;
+ 
+      return <div className="text-right font-medium">{data.name}</div>
+    },
   },
   {
     accessorKey: "decodedDataJson",
-    header: "Description",
+    header: "file",
     cell: ({ row }) => {
-      const data = row.getValue("timeCreated") as string;
-      return data;
-    }
+      const data = row.getValue("decodedDataJson") as any
+ 
+      return <div className="text-right font-medium">{data.file}</div>
+    },
   },
   {
     accessorKey: "decodedDataJson",
-    header: "Cid",
+    header: "description",
     cell: ({ row }) => {
-      const data = row.getValue("timeCreated") as string;
-      return data;
-    }
+      const data = row.getValue("decodedDataJson") as any;
+ 
+      return <div className="text-right font-medium">{data.description}</div>
+    },
   },
   {
     id: "select",

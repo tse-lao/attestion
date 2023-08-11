@@ -66,7 +66,6 @@ export default function AttestionDetails({
         setLoading(false)
         return  result
 
-
     };
 
     if (id) {

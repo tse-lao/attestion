@@ -72,7 +72,7 @@ export default function LoginButton() {
           <Image
             src="https://ipfs.io/ipfs/bafkreiakkhglt2w4zcq42jostqesnyaruaqgpt2rv5mk3twq2zsoockbb4"
             alt="Avatar"
-            objectFit="contain"
+            objectFit="cover"
             layout="fill"
           />
 
