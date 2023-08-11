@@ -39,6 +39,7 @@ export default function Worldcoin() {
 		abi: CONTRACTS.worldcoin[420].abi,
 		enabled: proof != null && address != null,
 		functionName: 'MintHumanBadge',
+		value: readFees?.nativeFee,
 		args: [
 			address!,
 			proof?.merkle_root ? decode<BigInt>('uint256', proof?.merkle_root ?? '') : BigInt(0),
@@ -59,8 +60,6 @@ export default function Worldcoin() {
 						BigInt(0),
 				  ],
 		],
-		//@ts-ignore
-		gas: readFees?.gas,
 	})
 	const { write } = useContractWrite(config)
 
