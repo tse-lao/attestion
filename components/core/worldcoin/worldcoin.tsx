@@ -61,8 +61,6 @@ export default function Worldcoin() {
 		],
 		//@ts-ignore
 		value: readFees?.nativeFee,
-		console.log(readFees?.nativeFee)
-
 	})
 	const { write } = useContractWrite(config)
 
