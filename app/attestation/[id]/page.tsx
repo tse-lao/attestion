@@ -19,7 +19,7 @@ export default function AttestationPage({
 }) {
   const [data, setData] = useState<any>({});
   const [details, setDetails] = useState<any>({
-    mintPrice: 0,
+    mintPrice: "0",
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [hasAccess, setHasAccess] = useState<any>({
@@ -32,7 +32,8 @@ export default function AttestationPage({
     address: CONTRACTS.attestionFactory[420].contract,
     abi: CONTRACTS.attestionFactory[420].abi,
     functionName: "mint",
-    args: [details.mintPrice, details.schemaUID],
+    args: [params.id,1],
+    value: details.mintPrice
   });
   const {
     isLoading: resolveLoading,
@@ -132,7 +133,7 @@ export default function AttestationPage({
 
           <div className="flex flex-col gap-4">
             {hasAccess.fileAccess ? (
-                data.isMintable ? (
+                !data.isMintable ? (
                <Button
                onClick={() => {
                  resolve();
@@ -173,7 +174,7 @@ export default function AttestationPage({
                 ) : (
                   "Mint to view attestions"
                 )}
-                Mint to view attestions {data.mintPrice} ETH
+                Subscribe to get access {data.mintPrice} ETH
               </Button>
             ) : (
               <Button disabled>Private DataPool</Button>

@@ -56,7 +56,7 @@ export default function LoginButton() {
           {truncateTextMiddle(address, 13)}
           {showModal && <ProfileDetails address={address} showModal={showModal} setShowModal={setShowModal} />}
         </button>
-        {chain?.id != 420 && chain?.id != 84531 && (
+        {chain?.id != 420 && chain?.id != 84531 && chain?.id != 5 && (
           <Button className="bg-red-600"  onClick={() => setShowModal(!showModal)}>
             Unsupported Chain
           </Button>

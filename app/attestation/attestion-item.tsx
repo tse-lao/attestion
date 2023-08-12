@@ -43,8 +43,8 @@ export default function AttestionItem({ schema}: {schema: any}) {
     
     <div className="grid  m-4 items-start gap-2 ">
       <IconItem icon={<TimerIcon />} value={schema.attestResolutionDays} />
-      { schema.isMintable ? <IconItem icon={<BookOpenCheckIcon />} value="Open" /> : <IconItem icon={<BookLockIcon />} value="Close" />}
-      { schema.isMintable ? <IconItem icon={<CoinsIcon />} value={formatEther(schema.mintPrice)} /> :  <IconItem icon={<GemIcon />} value={schema.attestReward} />}
+      { !schema.isMintable ? <IconItem icon={<BookOpenCheckIcon />} value="Open" /> : <IconItem icon={<BookLockIcon />} value="Close" />}
+      { !schema.isMintable ? <IconItem icon={<CoinsIcon />} value={formatEther(schema.mintPrice)} /> :  <IconItem icon={<GemIcon />} value={schema.attestReward} />}
      
     </div>
 
