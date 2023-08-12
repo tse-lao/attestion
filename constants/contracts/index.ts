@@ -3,6 +3,8 @@ import attestationAbi from "../abi/attestation.json";
 import attestationFactoryAbi from "../abi/attestationFactory.json";
 import tokenCreatorAbi from "../abi/tokenCreator.json";
 import worldcoinAbi from "../abi/worldcoin.json";
+import baseWorldcoinAbi from "../abi/baseHuman.json";
+
 //get the chains id from the env
 //optmisticTestnet = 420
 //base = 84531
@@ -31,12 +33,12 @@ export const CONTRACTS = {
   },
   worldcoin: {
     420: {
-      contract: "0x2B4b59510E206894f3F6b28FadBe9138072BA8F7" as Address,
+      contract: "0x9810105dfa3c9B7fe1B30f18a53511F287249bB2" as Address,
       abi: worldcoinAbi,
     },
     84531: {
-      contract: "0x2B4b59510E206894f3F6b28FadBe9138072BA8F7" as Address,
-      abi: worldcoinAbi,
+      contract: "0x7f274171AD80eF59E4ba136c378685250E0Bf96d" as Address,
+      abi: baseWorldcoinAbi,
     },
   },
 

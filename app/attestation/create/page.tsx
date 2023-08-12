@@ -25,7 +25,7 @@ import { useState } from "react";
 //@ts-ignore
 import TagsInput from 'react-tagsinput';
 import { toast } from "react-toastify";
-import { Address, useContractWrite, usePublicClient } from "wagmi";
+import { Address, useContractWrite, usePublicClient,useWaitForTransaction } from "wagmi";
 export type RevokerItem = {
   token: string;
   type: string;
@@ -63,6 +63,7 @@ export default function CreateAttestion() {
   
   const [customRevokers, setCustomRevokers] = useState<string[]>([]);
   const [customAttesters, setCustomAttesters] = useState<string[]>([]);
+  const [customTokenGatedHash, setCustomTokenGatedHash] = useState<string>("")
   const [showAModal, setShowAModal] = useState(false);
   const [showRModal, setShowRModal] = useState(false);
   const publicClient = usePublicClient();
@@ -73,10 +74,21 @@ export default function CreateAttestion() {
     functionName: "createSuperSchema",
   });
   
-  const { data:customData, isLoading:loadingTokenCreate, isSuccess:customSuccess, write:customCreate} = useContractWrite({
+  const { data:customData, isLoading:loadingTokenCreate, isSuccess:customSuccess, writeAsync:customCreate} = useContractWrite({
     address: CONTRACTS.tokenCreator[420].contract,
     abi: CONTRACTS.tokenCreator[420].abi,
     functionName: "createAccessControlContract",
+    onSuccess(data) {
+      console.log('Success', data)
+      setCustomTokenGatedHash(data.hash)
+      // const { data: txData, isError, isLoading,isFetched } = useWaitForTransaction({
+      //   // @ts-ignore
+      //   hash: data.hash
+      // })
+    },
+    onSettled(data){
+      console.log(data)
+    }
   });
   
   
@@ -162,16 +174,18 @@ export default function CreateAttestion() {
 
     //[attestionDays, schema, mintPrice, attestReward, mitnable]
     
-    if(formData.attesterStatus == 5 || formData.revokerStatus == 5){
-      //we want to create here the customAddress
+    // if(formData.attesterStatus == 5 || formData.revokerStatus == 5){
+    //   //we want to create here the customAddress
       
-      const attesters = formData.attesterStatus == 5 ? customAttesters : []
-      const revokers = formData.revokerStatus == 5 ? customRevokers : []
+    //   const attesters = formData.attesterStatus == 5 ? customAttesters : []
+    //   const revokers = formData.revokerStatus == 5 ? customRevokers : []
 
-      customCreate({
-        args: [attesters, revokers]
-      })
-    }
+    //   let results =  customCreate({
+    //     args: [attesters, revokers]
+    //   })
+
+    //   console.log(results)
+    // }
     
     //convert to days.. 
     const days = formData.resolutionDays * 3600;
@@ -191,7 +205,14 @@ export default function CreateAttestion() {
     let tokenGateEnumA = formData.attesterStatus;
     let tokenGateEnumR = formData.revokerStatus;
     if(formData.attesterStatus == 5){ tokenGateEnumA = 1}
-    if(formData.revokerStatus == 5){ tokenGateEnumR = 1}
+    if(formData.revokerStatus == 5 || formData.revokerStatus == 8){ tokenGateEnumR = 1}
+    const attesters = formData.attesterStatus == 5 ? customAttesters : []
+    const revokers = formData.revokerStatus == 5 ? customRevokers : []
+    if((customAttesters.length != 0 || customRevokers.length != 0) && (formData.attesterStatus == 5 || formData.revokerStatus == 5)){
+      customCreate({
+        args: [attesters, revokers]
+      })
+    }
     
     const tokenGateEnum = [tokenGateEnumA, tokenGateEnumR];
     const tokenGateTokenID = [formData.attesterTokenID,formData.revokerTokenID];
@@ -235,6 +256,15 @@ export default function CreateAttestion() {
         });
         return;
       }
+      if(e === "5"){
+        setFormData({
+          ...formData,
+          attesterStatus: e,
+          attesterTokenID: 0,
+          attesterToken: CONTRACTS.worldcoin[420].contract,
+        });
+        return;
+      }
       setFormData({
         ...formData,
         attesterStatus: e,
@@ -250,6 +280,24 @@ export default function CreateAttestion() {
           revokerStatus: e,
           revokerTokenID: 0,
           revokerToken: CONTRACTS.worldcoin[420].contract,
+        });
+        return
+      }
+      if(e === "8"){
+        setFormData({
+          ...formData,
+          revokerStatus: e,
+          revokerTokenID: 0,
+          revokerToken: "0x0000000000000000000000000000000000000001",
+        });
+        return
+      }
+      if(e === "5"){
+        setFormData({
+          ...formData,
+          revokerStatus: e,
+          revokerTokenID: 0,
+          revokerToken: "0x0000000000000000000000000000000000000000",
         });
         return
       }
@@ -612,8 +660,9 @@ export default function CreateAttestion() {
                     <SelectItem value="0">Anyone</SelectItem>
                     <SelectItem value="4">Token</SelectItem>
                     <SelectItem value="6">Verified Humans</SelectItem>
-                    <SelectItem value="7" disabled>Sismo Proof</SelectItem>
+                    <SelectItem value="8">No one</SelectItem>
                     <SelectItem value="5">Custom</SelectItem>
+                    <SelectItem value="7" disabled>Sismo Proof</SelectItem>
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -631,7 +680,7 @@ export default function CreateAttestion() {
                 )
               }
               {
-                formData.revokerStatus != 5 && (
+                (formData.revokerStatus != 5 )&& (
                   <Input
                   name="revokerToken"
                   type="text"
@@ -644,6 +693,7 @@ export default function CreateAttestion() {
                 />
                 )
               }
+              
                
               </div>
             </div>

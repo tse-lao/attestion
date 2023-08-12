@@ -4,11 +4,14 @@ import { CONTRACTS } from '@/constants/contracts'
 import { decode } from '@/lib/wld'
 import { IDKitWidget, ISuccessResult } from '@worldcoin/idkit'
 import { useEffect, useState } from 'react'
-import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite } from 'wagmi'
+import { useAccount, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from 'wagmi'
 
 export default function Worldcoin() {
+	const { chain, chains } = useNetwork()
+
 	const { address } = useAccount()
 	const [claimed, setClaimed] = useState(false)
+	const [fees, setFees] = useState(BigInt(0))
 	const [proof, setProof] = useState<ISuccessResult | null>(null)
 	const [estimateValue, setEstimatedValue] = useState<bigint | null>(null)
 	const {data: isClaimed, isLoading} = useContractRead({
@@ -17,28 +20,49 @@ export default function Worldcoin() {
 		functionName: 'balanceOf',
 		args: [address],
 	});
-	
-	const {data: readFees, isLoading: readFeesLoading} = useContractRead({
-		address: CONTRACTS.worldcoin[420].contract,
-		abi: CONTRACTS.worldcoin[420].abi,
-		functionName: 'estimateFees',
-		args: ["0x00010000000000000000000000000000000000000000000000000000000000030d40", address],
+
+	const {data: isClaimedBase, isLoading :isLoadingBase} = useContractRead({
+		address: CONTRACTS.worldcoin[84531].contract,
+		abi: CONTRACTS.worldcoin[84531].abi,
+		functionName: 'balanceOf',
+		args: [address],
 	});
 
-	useEffect(() => {
 
-		if(isClaimed == "0n"){
-			setClaimed(false)
+	const {data: readFeesBase, isLoading: readFeesBaseLoading} = useContractRead({
+		address: CONTRACTS.worldcoin[420].contract,
+		abi: CONTRACTS.worldcoin[420].abi,
+		functionName: 'estimateFeesBase',
+		args: [address],
+	})
+
+	useEffect(() => {
+		if(chain?.id == 420){
+
+			// @ts-ignore
+			setFees(readFeesBase? readFeesBase[0] : 0)
+			if(isClaimed == 0){
+				setClaimed(false)
+			}
+			else{
+				setClaimed(true)
+			}
 		}else{
-			setClaimed(true)
-			
+			if(isClaimedBase == 0){
+				setClaimed(false)
+			}
+			else{
+				setClaimed(true)
+			}
 		}
-	}, [isClaimed])
+
+	}, [isClaimed,isClaimedBase,readFeesBase, chain?.id ])
 	
 	useEffect(() => {
-	  console.log(readFees)
-	  setEstimatedValue(readFees)
-	}, [readFees])
+	  console.log(readFeesBase)
+	  //@ts-ignore
+	  setEstimatedValue(readFeesBase)
+	}, [readFeesBase])
 	
 	
 	const { config } = usePrepareContractWrite({
@@ -46,6 +70,7 @@ export default function Worldcoin() {
 		abi: CONTRACTS.worldcoin[420].abi,
 		enabled: proof != null && address != null,
 		functionName: 'MintHumanBadge',
+		value: fees,
 		args: [
 			address!,
 			proof?.merkle_root ? decode<BigInt>('uint256', proof?.merkle_root ?? '') : BigInt(0),
@@ -66,7 +91,6 @@ export default function Worldcoin() {
 						BigInt(0),
 				  ],
 		],
-		value: estimateValue || BigInt(0),
 	})
 	const { write } = useContractWrite(config)
 
@@ -74,7 +98,7 @@ export default function Worldcoin() {
 	return (
 		<main>
 			{address ? (
-				claimed ? (
+				!claimed ? (
 				proof ? (
 					<Button onClick={write}
                         className="hover:bg-purple-700"
@@ -85,6 +109,8 @@ export default function Worldcoin() {
 						action="superattestations"
 						signal={address}
 						onSuccess={setProof}
+						credential_types={['orb']} // we recommend only allowing orb verification on-chain
+						enableTelemetry
 					>
 						{({ open }) => <Button onClick={open} >Verify</Button>}
 					</IDKitWidget>
