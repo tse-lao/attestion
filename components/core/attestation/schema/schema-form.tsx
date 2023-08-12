@@ -148,7 +148,7 @@ export default function SchemaForm({
       },
     });
 
-    const newAttestationUID = await tx.wait();
+    await tx.wait();
 
     toast.success("New attestation has been made");
     setLoading(false);

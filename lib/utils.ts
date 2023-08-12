@@ -5,16 +5,36 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
 
+
 export function secondsToDaysAndHours(seconds: number): string {
   // Constants
   const SECONDS_IN_AN_HOUR = 3600;
   const SECONDS_IN_A_DAY = 24 * SECONDS_IN_AN_HOUR;
+  const SECONDS_IN_A_MINUTE = 60;
 
-  // Calculate days and hours
+  // Calculate days, hours, minutes, and seconds
   const days = Math.floor(seconds / SECONDS_IN_A_DAY);
-  const remainingSeconds = seconds % SECONDS_IN_A_DAY;
-  const hours = Math.floor(remainingSeconds / SECONDS_IN_AN_HOUR);
+  const remainingSecondsAfterDays = seconds % SECONDS_IN_A_DAY;
+  const hours = Math.floor(remainingSecondsAfterDays / SECONDS_IN_AN_HOUR);
+  const remainingSecondsAfterHours = remainingSecondsAfterDays % SECONDS_IN_AN_HOUR;
+  const minutes = Math.floor(remainingSecondsAfterHours / SECONDS_IN_A_MINUTE);
+  const remainingSecondsFinal = remainingSecondsAfterHours % SECONDS_IN_A_MINUTE;
 
-  // Return the formatted result
-  return `${days} days and ${hours} hours`;
+  // Construct the formatted result
+  const formattedResult = [];
+  if (days > 0) {
+    formattedResult.push(`${days} days`);
+  }
+  if (hours > 0) {
+    formattedResult.push(`${hours} hours`);
+  }
+  if (minutes > 0) {
+    formattedResult.push(`${minutes} minutes`);
+  }
+  if (remainingSecondsFinal > 0) {
+    formattedResult.push(`${remainingSecondsFinal} seconds`);
+  }
+
+  // Join the components and return the result
+  return formattedResult.join(', ');
 }
