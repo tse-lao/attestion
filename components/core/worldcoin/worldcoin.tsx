@@ -109,7 +109,6 @@ export default function Worldcoin() {
 						action="superattestations"
 						signal={address}
 						onSuccess={setProof}
-						credential_types={['orb']} // we recommend only allowing orb verification on-chain
 						enableTelemetry
 					>
 						{({ open }) => <Button onClick={open} >Verify</Button>}

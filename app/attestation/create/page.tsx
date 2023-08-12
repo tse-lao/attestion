@@ -25,7 +25,7 @@ import { useState } from "react";
 //@ts-ignore
 import TagsInput from 'react-tagsinput';
 import { toast } from "react-toastify";
-import { Address, useContractWrite, usePublicClient,useWaitForTransaction } from "wagmi";
+import { Address, useContractWrite, usePublicClient } from "wagmi";
 export type RevokerItem = {
   token: string;
   type: string;
@@ -78,17 +78,6 @@ export default function CreateAttestion() {
     address: CONTRACTS.tokenCreator[420].contract,
     abi: CONTRACTS.tokenCreator[420].abi,
     functionName: "createAccessControlContract",
-    onSuccess(data) {
-      console.log('Success', data)
-      setCustomTokenGatedHash(data.hash)
-      // const { data: txData, isError, isLoading,isFetched } = useWaitForTransaction({
-      //   // @ts-ignore
-      //   hash: data.hash
-      // })
-    },
-    onSettled(data){
-      console.log(data)
-    }
   });
   
   
@@ -172,20 +161,20 @@ export default function CreateAttestion() {
     e.preventDefault();
     console.log(formData);
 
-    //[attestionDays, schema, mintPrice, attestReward, mitnable]
+   // [attestionDays, schema, mintPrice, attestReward, mitnable]
     
-    // if(formData.attesterStatus == 5 || formData.revokerStatus == 5){
-    //   //we want to create here the customAddress
+     if(formData.attesterStatus == 5 || formData.revokerStatus == 5){
+       //we want to create here the customAddress
       
-    //   const attesters = formData.attesterStatus == 5 ? customAttesters : []
-    //   const revokers = formData.revokerStatus == 5 ? customRevokers : []
+      const attesters = formData.attesterStatus == 5 ? customAttesters : []
+      const revokers = formData.revokerStatus == 5 ? customRevokers : []
 
-    //   let results =  customCreate({
-    //     args: [attesters, revokers]
-    //   })
+      customCreate({
+         args: [attesters, revokers]
+      })
 
-    //   console.log(results)
-    // }
+      return;
+     }
     
     //convert to days.. 
     const days = formData.resolutionDays * 3600;
@@ -204,8 +193,8 @@ export default function CreateAttestion() {
     
     let tokenGateEnumA = formData.attesterStatus;
     let tokenGateEnumR = formData.revokerStatus;
-    if(formData.attesterStatus == 5){ tokenGateEnumA = 1}
-    if(formData.revokerStatus == 5 || formData.revokerStatus == 8){ tokenGateEnumR = 1}
+    if(formData.attesterStatus == 5 || formData.attesterStatus == 6 || formData.attesterStatus == 8){ tokenGateEnumA = 1}
+    if(formData.revokerStatus == 5 || formData.revokerStatus == 8 || formData.attesterStatus == 6){ tokenGateEnumR = 1}
     const attesters = formData.attesterStatus == 5 ? customAttesters : []
     const revokers = formData.revokerStatus == 5 ? customRevokers : []
     if((customAttesters.length != 0 || customRevokers.length != 0) && (formData.attesterStatus == 5 || formData.revokerStatus == 5)){
@@ -216,7 +205,13 @@ export default function CreateAttestion() {
     
     const tokenGateEnum = [tokenGateEnumA, tokenGateEnumR];
     const tokenGateTokenID = [formData.attesterTokenID,formData.revokerTokenID];
-    
+  
+    if(customData){
+      console.log(customData)
+      //tokenGateAddresses.push(customData)
+      //tokenGateEnum.push(5)
+      //tokenGateTokenID.push(0)
+    }
     write({
       args: [tokenGateAddresses, tokenGateEnum, tokenGateTokenID, params],
     });
@@ -371,8 +366,8 @@ export default function CreateAttestion() {
     return (
       <main>
         <div className=" p-8 m-12 rounded-md flex flex-col justify-center items-center">
-            <h1>Succesfully create library</h1>
-            <Link href="/attestation">
+            <h1>Succesfully Created a new library</h1>
+            <Link href="/attestation" className="text-green-500">
               Go to libraries
               </Link>
           </div>
