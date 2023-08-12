@@ -10,6 +10,7 @@ export default function Worldcoin() {
 	const { address } = useAccount()
 	const [claimed, setClaimed] = useState(false)
 	const [proof, setProof] = useState<ISuccessResult | null>(null)
+	const [estimateValue, setEstimatedValue] = useState<bigint | null>(null)
 	const {data: isClaimed, isLoading} = useContractRead({
 		address: CONTRACTS.worldcoin[420].contract,
 		abi: CONTRACTS.worldcoin[420].abi,
@@ -33,6 +34,12 @@ export default function Worldcoin() {
 			
 		}
 	}, [isClaimed])
+	
+	useEffect(() => {
+	  console.log(readFees)
+	  setEstimatedValue(readFees)
+	}, [readFees])
+	
 	
 	const { config } = usePrepareContractWrite({
 		address: CONTRACTS.worldcoin[420].contract,
@@ -59,8 +66,7 @@ export default function Worldcoin() {
 						BigInt(0),
 				  ],
 		],
-		//@ts-ignore
-		gas: readFees?.gas,
+		value: estimateValue || BigInt(0),
 	})
 	const { write } = useContractWrite(config)
 
