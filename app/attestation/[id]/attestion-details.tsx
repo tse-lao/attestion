@@ -109,7 +109,7 @@ export default function AttestionDetails({
         </Card>
       </TabsContent>
       <TabsContent value="view" className="w-full">
-        {hasAccess.attest ? <AttestionData id={id} attestations={listAttest}/> : <div> No access </div>}
+        {hasAccess.fileAccess ? <AttestionData id={id} attestations={listAttest}/> : <div> No access </div>}
       </TabsContent>
       <TabsContent value="revoke" className="w-full">
         {hasAccess.revoke ? (

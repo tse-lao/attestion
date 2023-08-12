@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { CONTRACTS } from "@/constants/contracts";
 import { ReloadIcon } from "@radix-ui/react-icons";
 import { readContract } from "@wagmi/core";
-
+import { parseEther } from 'viem';
 import { Badge } from "@/components/ui/badge";
 import { secondsToDaysAndHours } from "@/lib/utils";
 import { useEffect, useState } from "react";
@@ -33,7 +33,7 @@ export default function AttestationPage({
     abi: CONTRACTS.attestionFactory[420].abi,
     functionName: "mint",
     args: [params.id,1],
-    value: details.mintPrice
+    value: data?.mintPrice
   });
   const {
     isLoading: resolveLoading,
@@ -172,9 +172,9 @@ export default function AttestationPage({
                     <ReloadIcon /> Minting..
                   </>
                 ) : (
-                  "Mint to view attestions"
+                  "Subscribe to get access "
                 )}
-                Subscribe to get access {data.mintPrice} ETH
+                price : {(data.mintPrice/1000000000000/1000000)} ETH
               </Button>
             ) : (
               <Button disabled>Private DataPool</Button>

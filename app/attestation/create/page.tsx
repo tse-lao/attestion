@@ -66,6 +66,10 @@ export default function CreateAttestion() {
   const [customTokenGatedHash, setCustomTokenGatedHash] = useState<string>("")
   const [showAModal, setShowAModal] = useState(false);
   const [showRModal, setShowRModal] = useState(false);
+  const [ENUMtype, setENUMType] = useState<number[]>([0,0]);
+  const [tokens, setTokens] = useState<number[]>([0,0]);
+  const [isCustom, setIsCustom] = useState(false)
+
   const publicClient = usePublicClient();
 
   const { data, isLoading, isSuccess, write } = useContractWrite({
@@ -202,6 +206,10 @@ export default function CreateAttestion() {
         args: [attesters, revokers]
       })
     }
+    if(formData.attesterStatus == 6) tokenGateEnumA = 0
+    if(formData.revokerStatus == 6) tokenGateEnumR = 0
+
+
     
     const tokenGateEnum = [tokenGateEnumA, tokenGateEnumR];
     const tokenGateTokenID = [formData.attesterTokenID,formData.revokerTokenID];
@@ -336,15 +344,17 @@ export default function CreateAttestion() {
     if (erc721 || erc1155) {
       toast.success("ERC721 token found");
       if (type == "attester") {
+        
         setFormData({
           ...formData,
-          attesterStatus: erc721 ? 1 : 2,
+          attesterStatus: erc721 ? 0 : 1,
         });
       }
       if (type == "revoker") {
+        
         setFormData({
           ...formData,
-          revokerStatus: erc721 ? 1 : 2,
+          revokerStatus: erc721 ? 0 : 1,
         });
       }
     }
