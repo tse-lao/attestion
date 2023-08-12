@@ -33,11 +33,11 @@ export const CONTRACTS = {
   },
   worldcoin: {
     420: {
-      contract: "0x9810105dfa3c9B7fe1B30f18a53511F287249bB2" as Address,
+      contract: "0x1Cf8eD1107427Fe78E89938c3988376523569A48" as Address,
       abi: worldcoinAbi,
     },
     84531: {
-      contract: "0x7f274171AD80eF59E4ba136c378685250E0Bf96d" as Address,
+      contract: "0xb84C99e037f326157Fe9196c89A0464F6202C9bb" as Address,
       abi: baseWorldcoinAbi,
     },
   },

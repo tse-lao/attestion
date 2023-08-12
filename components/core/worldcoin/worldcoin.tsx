@@ -4,7 +4,7 @@ import { CONTRACTS } from '@/constants/contracts'
 import { decode } from '@/lib/wld'
 import { IDKitWidget, ISuccessResult } from '@worldcoin/idkit'
 import { useEffect, useState } from 'react'
-import { useAccount, useContractRead, useContractWrite, useNetwork, usePrepareContractWrite } from 'wagmi'
+import { useAccount, useContractRead, useContractWrite, usePrepareContractWrite ,useNetwork} from 'wagmi'
 
 export default function Worldcoin() {
 	const { chain, chains } = useNetwork()
@@ -12,8 +12,8 @@ export default function Worldcoin() {
 	const { address } = useAccount()
 	const [claimed, setClaimed] = useState(false)
 	const [fees, setFees] = useState(BigInt(0))
+
 	const [proof, setProof] = useState<ISuccessResult | null>(null)
-	const [estimateValue, setEstimatedValue] = useState<bigint | null>(null)
 	const {data: isClaimed, isLoading} = useContractRead({
 		address: CONTRACTS.worldcoin[420].contract,
 		abi: CONTRACTS.worldcoin[420].abi,
@@ -21,49 +21,45 @@ export default function Worldcoin() {
 		args: [address],
 	});
 
-	const {data: isClaimedBase, isLoading :isLoadingBase} = useContractRead({
+	const {data: isClaimedBase, isLoading: isLoadingBase} = useContractRead({
 		address: CONTRACTS.worldcoin[84531].contract,
 		abi: CONTRACTS.worldcoin[84531].abi,
 		functionName: 'balanceOf',
 		args: [address],
 	});
-
+	
 
 	const {data: readFeesBase, isLoading: readFeesBaseLoading} = useContractRead({
 		address: CONTRACTS.worldcoin[420].contract,
 		abi: CONTRACTS.worldcoin[420].abi,
-		functionName: 'estimateFeesBase',
+		functionName: 'estimateFees',
 		args: [address],
 	})
 
 	useEffect(() => {
 		if(chain?.id == 420){
-
-			// @ts-ignore
-			setFees(readFeesBase? readFeesBase[0] : 0)
 			if(isClaimed == 0){
 				setClaimed(false)
-			}
-			else{
+			}else{
 				setClaimed(true)
+				
 			}
-		}else{
+			// @ts-ignore
+			setFees(readFeesBase)
+			console.log(readFeesBase)
+
+		}else if(chain?.id == 84531){
 			if(isClaimedBase == 0){
 				setClaimed(false)
-			}
-			else{
+			}else{
 				setClaimed(true)
+				
 			}
+		}else{
+			setClaimed(false)
 		}
 
-	}, [isClaimed,isClaimedBase,readFeesBase, chain?.id ])
-	
-	useEffect(() => {
-	  console.log(readFeesBase)
-	  //@ts-ignore
-	  setEstimatedValue(readFeesBase)
-	}, [readFeesBase])
-	
+	}, [isClaimed,isClaimedBase,readFeesBase])
 	
 	const { config } = usePrepareContractWrite({
 		address: CONTRACTS.worldcoin[420].contract,
@@ -97,7 +93,9 @@ export default function Worldcoin() {
 	if(isLoading) return <div>Loading...</div>
 	return (
 		<main>
-			{address ? (
+			{address ? (chain?.id == 84531 && !claimed? (<Button onClick={write}
+                        className="hover:bg-purple-700"
+                    >Change to OptimismGoerli</Button>) :
 				!claimed ? (
 				proof ? (
 					<Button onClick={write}
@@ -105,8 +103,8 @@ export default function Worldcoin() {
                     >Claim Token</Button>
 				) : (
 					<IDKitWidget
-						app_id="app_47ce5bdefaafbbecce98304424156ae9" // must be an app set to on-chain
-						action="superattestations"
+						app_id="app_staging_a47d8b8169a3e3e80953e86f1093d30d" // must be an app set to on-chain
+						action="human-verification"
 						signal={address}
 						onSuccess={setProof}
 						enableTelemetry
